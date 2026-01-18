@@ -1,0 +1,1 @@
+export type EventFilter = 'all' | 'active' | 'deleted';
