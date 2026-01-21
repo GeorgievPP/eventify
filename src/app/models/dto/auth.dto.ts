@@ -1,6 +1,6 @@
 import { UserRole } from "../auth";
 
-interface AuthApiUser {
+export interface AuthApiUser {
   id: string;
   email: string;
   role: UserRole;

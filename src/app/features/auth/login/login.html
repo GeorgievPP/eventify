@@ -1,1 +1,80 @@
-<p>login works!</p>
+<section class="container-app py-10">
+  <div class="mx-auto max-w-md">
+    <header class="text-center mb-6">
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Login</h1>
+      <p class="mt-2 text-sm" style="color: rgb(var(--muted))">
+        Welcome back. Please enter your credentials to continue.
+      </p>
+    </header>
+
+    <section class="card p-5 sm:p-6">
+      <form class="grid gap-4" [formGroup]="formGroup" (ngSubmit)="submit()">
+        <!-- Email -->
+        <div>
+          <label for="email" class="block text-sm font-medium mb-1">Email</label>
+          <input
+            class="input"
+            type="email"
+            formControlName="email"
+            id="email"
+            placeholder="you@example.com"
+            autocomplete="email"
+          />
+
+          @if (showEmailRequiredError) {
+            <p class="mt-2 text-xs" style="color: rgb(var(--danger))">Email is required.</p>
+          }
+          @if (showEmailInvalidError) {
+            <p class="mt-2 text-xs" style="color: rgb(var(--danger))">
+              Please enter a valid email.
+            </p>
+          }
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label for="password" class="block text-sm font-medium mb-1">Password</label>
+          <input
+            class="input"
+            type="password"
+            formControlName="password"
+            id="password"
+            placeholder="••••••••"
+            autocomplete="current-password"
+          />
+
+          @if (showPasswordRequiredError) {
+            <p class="mt-2 text-xs" style="color: rgb(var(--danger))">Password is required.</p>
+          }
+          @if (showPasswordInvalidError) {
+            <p class="mt-2 text-xs" style="color: rgb(var(--danger))">
+              Password must be at least 6 characters.
+            </p>
+          }
+        </div>
+
+        <!-- Submit Button-->
+        <button
+          type="submit"
+          class="btn btn-primary w-full"
+          [disabled]="formGroup.invalid || isLoading()"
+        >
+          @if (isLoading()) {
+            <span class="inline-flex items-center gap-2">
+              <span class="animate-spin">⏳</span>
+
+              Logging in...
+            </span>
+          } @else {
+            Login
+          }
+        </button>
+
+        <p class="text-sm text-center" style="color: rgb(var(--muted))">
+          Not registered?
+          <a routerLink="/register" class="nav-link">Create an account</a>
+        </p>
+      </form>
+    </section>
+  </div>
+</section>
