@@ -43,7 +43,6 @@ export class NotificationService {
       return crypto.randomUUID();
     }
 
-    // fallback за по-стар браузър
     return Math.random().toString(36).slice(2);
   }
 }
