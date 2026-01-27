@@ -1,3 +1,1113 @@
+html {
+  scroll-behavior: smooth;
+}
+
+/* =========================================================
+   Tailwind layers
+========================================================= */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* =========================================================
+   Theme tokens (CSS variables)
+   - RGB values (без rgb()) за да ползваме rgba(var(--x), a)
+========================================================= */
+:root {
+  /* Surfaces */
+  --bg: 255 255 255;
+  --card: 255 255 255;
+  --border: 228 228 231; /* zinc-200 */
+
+  /* Text */
+  --fg: 24 24 27; /* zinc-900 */
+  --muted: 113 113 122; /* zinc-500 */
+
+  /* Brand / Actions */
+  --accent: 136 19 55; /* dark red / wine */
+  --success: 16 185 129;
+  --danger: 239 68 68;
+}
+
+.dark {
+  /* Surfaces */
+  --bg: 9 9 11; /* zinc-950 */
+  --card: 24 24 27; /* zinc-900 */
+  --border: 63 63 70; /* zinc-700 */
+
+  /* Text */
+  --fg: 244 244 245; /* zinc-100 */
+  --muted: 161 161 170; /* zinc-400 */
+
+  /* Brand */
+  --accent: 220 38 38; /* red-600 (малко по-ярко за dark) */
+}
+
+/* =========================================================
+   Base / global
+========================================================= */
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background-color: rgb(var(--bg));
+  color: rgb(var(--fg));
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Inter, Arial, sans-serif;
+}
+
+/* =========================================================
+   Components layer (reusable primitives)
+========================================================= */
+@layer components {
+  /* -------------------------------------------------------
+     Layout
+  -------------------------------------------------------- */
+  .container-app {
+    @apply mx-auto w-full max-w-6xl px-4;
+  }
+
+  /* -------------------------------------------------------
+     Card
+  -------------------------------------------------------- */
+  .card {
+    @apply rounded-2xl border shadow-sm transition-all duration-300 ease-out;
+    background-color: rgb(var(--card));
+    border-color: rgb(var(--border));
+  }
+
+  /* Image inside card (zoom only on desktop hover via media query) */
+  .card-image {
+    @apply transition-transform duration-300 ease-out;
+  }
+
+  /* -------------------------------------------------------
+     Buttons
+  -------------------------------------------------------- */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-2
+           text-sm font-medium transition;
+  }
+
+  /* Primary */
+  .btn-primary {
+    @apply transition-all duration-200;
+    background-color: rgb(var(--accent));
+    color: white;
+  }
+
+  /* Ghost */
+  .btn-ghost {
+    @apply border transition-all duration-200;
+    background-color: transparent;
+    border-color: rgb(var(--border));
+  }
+
+  /* Accent soft (secondary action) */
+  .btn-accent-soft {
+    background-color: rgba(var(--accent), 0.15);
+    color: rgb(var(--accent));
+    border: 1px solid rgba(var(--accent), 0.35);
+  }
+
+  /* -------------------------------------------------------
+     Inputs
+  -------------------------------------------------------- */
+  .input {
+    @apply w-full rounded-2xl border px-4 py-2 text-sm outline-none transition;
+    background-color: rgb(var(--card));
+    border-color: rgb(var(--border));
+  }
+
+  .input:focus {
+    box-shadow: 0 0 0 4px rgba(var(--accent), 0.25);
+    border-color: rgba(var(--accent), 0.7);
+  }
+
+  /* -------------------------------------------------------
+     Badges / chips
+  -------------------------------------------------------- */
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold;
+    border: 1px solid rgb(var(--border));
+    background-color: rgba(var(--accent), 0.15);
+  }
+
+  /* -------------------------------------------------------
+     Navigation (desktop)
+  -------------------------------------------------------- */
+  .nav-link {
+    @apply relative text-sm text-zinc-700 dark:text-zinc-300 transition;
+    opacity: 0.85;
+  }
+
+  .nav-link:hover {
+    color: rgb(var(--accent));
+    opacity: 1;
+  }
+
+  .nav-link::after {
+    content: '';
+    @apply absolute left-0 -bottom-1 h-0.5 w-0 transition-all;
+    background-color: rgb(var(--accent));
+  }
+
+  .nav-link:hover::after,
+  .nav-link[aria-current='page']::after,
+  .nav-active::after {
+    width: 100%;
+  }
+
+  .nav-link[aria-current='page'],
+  .nav-active {
+    color: rgb(var(--accent));
+    opacity: 1;
+  }
+
+  /* -------------------------------------------------------
+     Navigation (mobile menu)
+  -------------------------------------------------------- */
+  .mobile-link {
+    @apply px-3 py-2 rounded-2xl text-sm text-zinc-800 dark:text-zinc-200 transition;
+    -webkit-tap-highlight-color: transparent; /* маха синьото highlight (Android) */
+  }
+
+  /* hover е полезно за iPad/desktop devtools, но на телефон се ползва :active */
+  .mobile-link:hover {
+    background-color: rgba(var(--accent), 0.18);
+  }
+
+  .mobile-link.mobile-active {
+    background-color: rgba(var(--accent), 0.18);
+    border: 1px solid rgba(var(--accent), 0.32);
+    color: rgb(var(--accent));
+  }
+
+  .mobile-link:active {
+    background-color: rgba(var(--accent), 0.22);
+  }
+
+  /* =======================================================
+     Feature-specific (Post Board / Search cards)
+  ======================================================== */
+  .price-badge {
+    border: 1px solid rgba(var(--accent), 0.28);
+    background: rgba(var(--accent), 0.12);
+    color: rgb(var(--fg));
+  }
+
+  .down {
+    border-color: rgba(16, 185, 129, 0.35);
+    background: rgba(16, 185, 129, 0.12);
+    color: rgb(16, 185, 129);
+  }
+
+  .up {
+    border-color: rgba(239, 68, 68, 0.35);
+    background: rgba(239, 68, 68, 0.12);
+    color: rgb(239, 68, 68);
+  }
+
+  /* Reset button (works on desktop + mobile) */
+  .btn-ghost.btn-reset {
+    border-color: rgba(var(--accent), 0.35);
+    color: rgb(var(--accent));
+    background-color: rgba(var(--accent), 0.08);
+  }
+
+  /* tap feedback on mobile */
+  .btn-ghost.btn-reset:active {
+    background-color: rgba(var(--accent), 0.18);
+  }
+
+  /* nice keyboard focus */
+  .btn-ghost.btn-reset:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(var(--accent), 0.25);
+    border-color: rgba(var(--accent), 0.7);
+  }
+
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  .footer-link {
+    color: rgb(var(--muted));
+    transition: color 0.2s ease;
+  }
+
+  .footer-link:hover {
+    color: rgb(var(--accent));
+  }
+
+  /* =======================================================
+   Details: Rating widget
+======================================================= */
+  .details-rating {
+    /* nothing special here, card already styles it */
+  }
+
+  .details-rating__actions {
+    display: grid;
+    gap: 6px;
+    justify-items: end;
+  }
+
+  .details-stars {
+    display: inline-flex;
+    gap: 6px;
+    padding: 6px 10px;
+    border: 1px solid rgb(var(--border));
+    border-radius: 9999px;
+    background: rgba(var(--accent), 0.06);
+  }
+
+  .details-star {
+    font-size: 18px;
+    line-height: 1;
+    padding: 4px 6px;
+    border-radius: 10px;
+    color: rgb(var(--muted));
+    transition: transform 150ms ease, color 150ms ease, background-color 150ms ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .details-star.is-filled {
+    color: rgb(var(--accent));
+  }
+
+  /* Hover effects ONLY on desktop-like pointers */
+  @media (hover: hover) and (pointer: fine) {
+    .details-star:hover {
+      transform: translateY(-1px);
+      background: rgba(var(--accent), 0.1);
+      color: rgb(var(--accent));
+    }
+  }
+
+  /* Mobile tap feedback (no jitter) */
+  @media (hover: none) and (pointer: coarse) {
+    .details-star:active {
+      background: rgba(var(--accent), 0.14);
+      color: rgb(var(--accent));
+    }
+  }
+
+  /* =======================================================
+   Details: Comments UI
+======================================================= */
+  .details-textarea {
+    width: 100%;
+    border-radius: 1rem; /* match rounded-2xl feel */
+    border: 1px solid rgb(var(--border));
+    background-color: rgb(var(--card));
+    color: rgb(var(--fg));
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    outline: none;
+    transition: box-shadow 0.2s, border-color 0.2s;
+    resize: vertical;
+  }
+
+  .details-textarea:focus {
+    box-shadow: 0 0 0 4px rgba(var(--accent), 0.25);
+    border-color: rgba(var(--accent), 0.7);
+  }
+
+  .comment-card {
+    border: 1px solid rgb(var(--border));
+    border-radius: 1.25rem;
+    background-color: rgb(var(--card));
+    padding: 1rem;
+  }
+
+  .comment-card.is-deleted {
+    opacity: 0.75;
+  }
+
+  .comment-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .comment-author {
+    font-weight: 700;
+    font-size: 0.9rem;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .comment-date {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    color: rgb(var(--muted));
+  }
+
+  .comment-text {
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: rgb(var(--fg));
+    word-break: break-word;
+  }
+
+  .comment-deleted-text {
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    color: rgb(var(--muted));
+  }
+
+  .comment-like {
+    padding: 0.4rem 0.75rem;
+    border-radius: 999px;
+  }
+
+  .comment-like.is-liked {
+    border-color: rgba(var(--accent), 0.45);
+    color: rgb(var(--accent));
+    background-color: rgba(var(--accent), 0.08);
+  }
+
+  .btn-danger-soft {
+    border-color: rgba(var(--danger), 0.45) !important;
+    color: rgb(var(--danger)) !important;
+    background-color: rgba(var(--danger), 0.08) !important;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .comment-card:hover {
+      transform: translateY(-2px);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.25);
+    }
+  }
+
+  /* =======================================================
+   Details: Show history (staff)
+======================================================= */
+  .history-card {
+    border: 1px solid rgb(var(--border));
+    border-radius: 1.25rem;
+    background-color: rgb(var(--card));
+    padding: 1rem;
+  }
+
+  .history-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .history-action {
+    font-weight: 800;
+    font-size: 0.95rem;
+    line-height: 1.2;
+  }
+
+  .history-meta {
+    margin-top: 0.35rem;
+    font-size: 0.75rem;
+    color: rgb(var(--muted));
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-items: center;
+  }
+
+  .history-dot {
+    opacity: 0.6;
+  }
+
+  .history-toggle {
+    padding: 0.4rem 0.75rem;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .history-arrow {
+    display: inline-block;
+    margin-left: 0.5rem;
+    transition: transform 0.2s ease;
+  }
+
+  .history-arrow.open {
+    transform: rotate(180deg);
+  }
+
+  .history-details {
+    margin-top: 0.9rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid rgb(var(--border));
+  }
+
+  .diff-list {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .diff-item {
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 640px) {
+    .diff-item {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .diff-label {
+    color: rgb(var(--muted));
+  }
+
+  .diff-value {
+    color: rgb(var(--fg));
+    word-break: break-word;
+  }
+
+  .price-change {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    border: 1px solid rgba(var(--accent), 0.28);
+    background: rgba(var(--accent), 0.12);
+  }
+
+  .price-change.up {
+    border-color: rgba(239, 68, 68, 0.35);
+    background: rgba(239, 68, 68, 0.12);
+    color: rgb(239, 68, 68);
+  }
+
+  .price-change.down {
+    border-color: rgba(16, 185, 129, 0.35);
+    background: rgba(16, 185, 129, 0.12);
+    color: rgb(16, 185, 129);
+  }
+
+  .btn-danger {
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    background: rgba(239, 68, 68, 0.12);
+    color: rgb(239, 68, 68);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .history-card:hover {
+      transform: translateY(-2px);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.25);
+    }
+
+    /* общ hover за всички бутони */
+    .btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.03);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    /* Primary – малко по-силен */
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.06);
+    }
+
+    /* Ghost */
+    .btn-ghost:hover {
+      background-color: rgba(255, 255, 255, 0.06);
+    }
+
+    /* Accent soft */
+    .btn-accent-soft:hover {
+      background-color: rgba(var(--accent), 0.25);
+    }
+
+    /* опасни/деструктивни ако имаш */
+    .btn-danger:hover {
+      filter: brightness(1.05);
+    }
+  }
+
+  /* =======================================================
+   Modal (shared)
+======================================================= */
+
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .modal {
+    width: 100%;
+    max-width: 520px;
+    border-radius: 1.25rem;
+    border: 1px solid rgb(var(--border));
+    background: rgb(var(--card));
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+    overflow: hidden;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgb(var(--border));
+  }
+
+  .modal-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+  }
+
+  .modal-x {
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+  }
+
+  .modal-body {
+    padding: 1rem 1.25rem;
+  }
+
+  .modal-footer {
+    padding: 1rem 1.25rem;
+    border-top: 1px solid rgb(var(--border));
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+  }
+
+  .confirm-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(2px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .confirm-dialog {
+    width: 100%;
+    max-width: 420px;
+    padding: 1.5rem;
+
+    border-radius: 1rem;
+    background: rgb(var(--card));
+    border: 1px solid rgb(var(--border));
+
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45), 0 8px 20px rgba(0, 0, 0, 0.25);
+
+    animation: modalIn 160ms ease-out;
+  }
+
+  .confirm-dialog h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .confirm-dialog p {
+    font-size: 0.9rem;
+    color: rgb(var(--muted));
+    line-height: 1.5;
+  }
+
+  @keyframes modalIn {
+    from {
+      opacity: 0;
+      transform: translateY(6px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .confirm-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+  }
+
+  .btn-cancel {
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+
+    background: transparent;
+    border: 1px solid rgb(var(--border));
+    color: rgb(var(--fg));
+
+    transition: transform 0.15s ease, background-color 0.15s ease;
+  }
+
+  .btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateY(-1px);
+  }
+
+  .btn-delete {
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+
+    background: rgb(var(--danger));
+    color: white;
+    border: none;
+
+    transition: transform 0.15s ease, filter 0.15s ease;
+  }
+
+  .btn-delete:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .group:hover .card {
+      transform: none; /* да не се вдига dropdown картата */
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+    }
+  }
+
+  /* =======================================================
+     Hover effects ONLY on real hover devices (desktop)
+     - така няма “треперене” на мобиле
+  ======================================================== */
+  @media (hover: hover) and (pointer: fine) {
+    /* Card lift */
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Image zoom on card hover */
+    .card:hover .card-image {
+      transform: scale(1.03);
+    }
+
+    /* Primary hover */
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+
+    /* Subtle glow when hovering a whole card */
+    .card:hover .btn-primary {
+      box-shadow: 0 6px 16px rgba(var(--accent), 0.35);
+    }
+
+    .btn-ghost.btn-reset:hover {
+      background-color: rgba(var(--accent), 0.18);
+    }
+  }
+}
+
+/* ОРДЕРС */
+.orders-table-wrapper {
+  overflow: auto;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  border-radius: 1rem;
+}
+
+.table-scroll table {
+  min-width: 780px; /* важно: пази колоните четими */
+}
+
+.table-hint {
+  margin-top: 0.5rem;
+  font-size: 12px;
+  color: rgb(var(--muted));
+  text-align: right;
+}
+
+@media (min-width: 768px) {
+  .table-hint {
+    display: none;
+  }
+}
+
+.orders-table-wrapper {
+  position: relative;
+}
+
+/* хоризонтален скрол */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  border-radius: 1rem;
+}
+
+/* пази колоните четими */
+.table-scroll table {
+  min-width: 780px;
+}
+
+/* ✅ стилна подсказка: лек градиент вдясно (само на мобиле) */
+@media (max-width: 767px) {
+  .orders-table-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0.75rem;
+    bottom: 0.75rem;
+    right: 0.5rem;
+    width: 34px;
+    pointer-events: none;
+    border-radius: 1rem;
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0));
+    opacity: 0.75;
+  }
+}
+
+/* (по желание) по-деликатен scrollbar */
+.table-scroll::-webkit-scrollbar {
+  height: 10px;
+}
+.table-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+.table-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ОРДЕРС ФИНИШ */
+
+/* ADMIN DASHBOARD */
+.dash-pill {
+  padding: 0.5rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: rgb(var(--muted));
+  transition: transform 150ms ease, background-color 150ms ease, color 150ms ease;
+}
+
+.dash-pill.is-active {
+  background: rgba(var(--accent), 0.18);
+  color: rgb(var(--accent));
+  border: 1px solid rgba(var(--accent), 0.35);
+}
+
+.dash-mini {
+  border: 1px solid rgb(var(--border));
+  border-radius: 1rem;
+  padding: 0.75rem 0.85rem;
+  background: rgba(var(--accent), 0.04);
+}
+
+.dash-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid rgb(var(--border));
+  padding: 0.4rem 0.7rem;
+  background: rgba(var(--accent), 0.06);
+  transition: transform 150ms ease, background-color 150ms ease;
+}
+
+.dash-chip__label {
+  font-weight: 700;
+}
+
+.dash-chip__value {
+  display: inline-flex;
+  min-width: 28px;
+  justify-content: center;
+  border-radius: 9999px;
+  padding: 0.15rem 0.45rem;
+  font-weight: 800;
+  background: rgba(var(--accent), 0.18);
+}
+
+.dash-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 1px solid rgb(var(--border));
+  border-radius: 1.25rem;
+  padding: 0.9rem 1rem;
+  background: rgba(var(--accent), 0.03);
+  transition: transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dash-chip:hover,
+  .dash-row:hover {
+    transform: translateY(-1px);
+    background: rgba(var(--accent), 0.07);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.25);
+  }
+}
+
+/* ADMIN DASHBOARD END */
+
+/* ADMIN SHOWS */
+.admin-pill {
+  padding: 0.5rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: rgb(var(--muted));
+  transition: transform 150ms ease, background-color 150ms ease, color 150ms ease;
+}
+
+.admin-pill.is-active {
+  background: rgba(var(--accent), 0.18);
+  color: rgb(var(--accent));
+  border: 1px solid rgba(var(--accent), 0.35);
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1050px; /* гарантира, че ще има scroll на мобиле */
+  font-size: 0.9rem;
+}
+
+.admin-table thead th {
+  text-align: left;
+  padding: 14px 18px;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(var(--muted));
+  border-bottom: 1px solid rgb(var(--border));
+}
+
+.admin-table tbody td {
+  padding: 14px 18px;
+  border-bottom: 1px solid rgb(var(--border));
+  vertical-align: middle;
+}
+
+.admin-table .right {
+  text-align: right;
+}
+
+.admin-table .center {
+  text-align: center;
+}
+
+.admin-table tbody tr.is-deleted {
+  opacity: 0.75;
+}
+
+.admin-status {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  border: 1px solid rgb(var(--border));
+  background: rgba(var(--accent), 0.06);
+}
+
+.admin-status.is-active {
+  border-color: rgba(16, 185, 129, 0.35);
+  background: rgba(16, 185, 129, 0.12);
+  color: rgb(16, 185, 129);
+}
+
+.admin-status.is-deleted {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.12);
+  color: rgb(239, 68, 68);
+}
+
+/* Price column: perfect alignment */
+.admin-table th.price,
+.admin-table td.price {
+  /* text-align: right; */
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums; /* key part */
+  font-feature-settings: 'tnum' 1; /* fallback */
+}
+
+.admin-table th.price,
+.admin-table td.price {
+  width: 120px; /* или min-width ако предпочиташ */
+  min-width: 120px;
+}
+
+.admin-table td.price {
+  font-weight: 800; /* ако искаш да стои “strong” */
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .admin-table tbody tr:hover {
+    background: rgba(var(--accent), 0.04);
+  }
+}
+
+/* ADMIN SHOWS END */
+
+/* ADMIN USERS  */
+/* wrapper to allow horizontal scroll on mobile */
+.admin-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-table-hint {
+  padding: 10px 14px;
+  font-size: 12px;
+  color: rgb(var(--muted));
+  border-top: 1px solid rgb(var(--border));
+}
+
+/* Table */
+.admin-users-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px; /* keeps columns readable */
+}
+
+.admin-users-table th,
+.admin-users-table td {
+  padding: 16px 18px;
+  border-bottom: 1px solid rgb(var(--border));
+  vertical-align: middle;
+}
+
+.admin-users-table th {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+  color: rgb(var(--muted));
+  text-align: left;
+}
+
+.admin-users-table th.right,
+.admin-users-table td.right {
+  text-align: right;
+}
+
+.admin-users-table tr.is-deleted {
+  opacity: 0.75;
+}
+
+/* Role cell */
+.role-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-select {
+  min-width: 160px;
+  border-radius: 9999px;
+  border: 1px solid rgb(var(--border));
+  background: rgb(var(--card));
+  color: rgb(var(--fg));
+  padding: 8px 12px;
+  outline: none;
+
+  /* важно за native dropdown в dark mode */
+  color-scheme: dark;
+}
+
+.admin-select:focus {
+  box-shadow: 0 0 0 4px rgba(var(--accent), 0.25);
+  border-color: rgba(var(--accent), 0.7);
+}
+
+/* някои браузъри позволяват да стилизираш option */
+.admin-select option {
+  background: rgb(var(--card));
+  color: rgb(var(--fg));
+}
+
+/* ако е disabled да личи */
+.admin-select:disabled {
+  opacity: 0.6;
+}
+
+.saving {
+  font-size: 12px;
+  color: rgb(var(--muted));
+}
+
+/* Pills */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 9999px;
+  border: 1px solid rgb(var(--border));
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  background: rgba(var(--accent), 0.06);
+}
+
+.pill-success {
+  border-color: rgba(16, 185, 129, 0.35);
+  background: rgba(16, 185, 129, 0.12);
+  color: rgb(16, 185, 129);
+}
+
+.pill-danger {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.12);
+  color: rgb(239, 68, 68);
+}
+
+/* Right-side status layout */
+.status-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+/* Small monospace helper */
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
+}
+
+/* ADMIN USERS END */

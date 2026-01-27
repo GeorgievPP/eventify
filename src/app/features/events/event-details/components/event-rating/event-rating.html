@@ -1,1 +1,48 @@
-<p>event-rating works!</p>
+<section class="container-app pb-2">
+  <section class="card p-5 sm:p-6 details-rating">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div>
+        <h2 class="text-lg font-bold">Rating</h2>
+
+        @if (event?.ratingCount) {
+        <p class="mt-1 text-sm" style="color: rgb(var(--muted))">
+          ★ {{ event?.ratingAvg | number : '1.1-2' }}
+          <span class="opacity-80">({{ event?.ratingCount }} ratings)</span>
+        </p>
+        } @else {
+        <p class="mt-1 text-sm" style="color: rgb(var(--muted))">No ratings yet.</p>
+        }
+      </div>
+
+      @if (userId) {
+      <div class="details-rating__actions">
+        <span class="text-sm font-medium" style="color: rgb(var(--muted))">Your rating:</span>
+
+        <div class="details-stars" role="radiogroup" aria-label="Rate this event">
+          @for (star of stars; track star) {
+          <button
+            type="button"
+            class="details-star"
+            [class.is-filled]="display() >= star"
+            (mouseenter)="onStarEnter(star)"
+            (mouseleave)="onStarLeave()"
+            (click)="onRate(star)"
+            [disabled]="submitting"
+            [attr.aria-label]="'Rate ' + star + ' out of 5'"
+          >
+            ★
+          </button>
+          }
+        </div>
+
+        <div class="text-xs mt-1" style="color: rgb(var(--muted))">
+          @if (submitting) { Saving… } @else if (userRating()) { You rated: {{ userRating() }}/5 }
+          @else { Click a star to rate }
+        </div>
+      </div>
+      } @else {
+      <p class="text-sm" style="color: rgb(var(--muted))">Log in to rate this event.</p>
+      }
+    </div>
+  </section>
+</section>

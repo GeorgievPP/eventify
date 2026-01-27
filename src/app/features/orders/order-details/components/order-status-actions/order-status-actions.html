@@ -1,1 +1,47 @@
-<p>order-status-actions works!</p>
+@if (canChangeStatus()) {
+<div
+  class="mt-6 pt-5 flex flex-col lg:flex-row lg:items-end gap-3"
+  style="border-top: 1px solid rgb(var(--border))"
+>
+  <label class="grid gap-2 max-w-sm">
+    <span class="text-sm font-medium" style="color: rgb(var(--muted))">Change status</span>
+
+    <select
+      class="input"
+      [ngModel]="selectedStatus"
+      (ngModelChange)="onStatusChange($event)"
+      [disabled]="savingStatus()"
+    >
+      @for (s of statusOptions(); track s) {
+      <option [ngValue]="s">{{ s }}</option>
+      }
+    </select>
+  </label>
+
+  <div class="flex flex-col sm:flex-row gap-2 sm:justify-end lg:ml-auto">
+    <button type="button" class="btn btn-primary" (click)="save.emit()" [disabled]="savingStatus()">
+      @if (savingStatus()) { Saving… } @else { Save }
+    </button>
+
+    <button
+      type="button"
+      class="btn btn-ghost btn-danger-soft"
+      (click)="openCancelModal()"
+      [disabled]="cancelling() || !canCancel()"
+    >
+      @if (cancelling()) { Cancelling… } @else { Cancel order }
+    </button>
+  </div>
+</div>
+
+<app-confirm-dialog
+  [open]="cancelModalOpen()"
+  title="Cancel order"
+  message="You are about to cancel this order. This action cannot be undone."
+  confirmText="Cancel order"
+  cancelText="Keep order"
+  variant="danger"
+  (cancel)="closeCancelModal()"
+  (confirm)="confirmCancel()"
+/>
+}

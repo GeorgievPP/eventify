@@ -1,0 +1,2 @@
+.arrow { transition: transform .2s ease; }
+.arrow.open { transform: rotate(180deg); }

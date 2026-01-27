@@ -1,1 +1,136 @@
-<p>about works!</p>
+<section class="container-app py-12">
+  <!-- HERO -->
+  <header class="max-w-3xl">
+    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight">About Eventify</h1>
+
+    <p class="mt-4 text-lg" style="color: rgb(var(--muted))">
+      Eventify is a modern platform for discovering, booking, and experiencing live events — built with
+      performance, clarity, and real-world workflows in mind.
+    </p>
+  </header>
+
+  <!-- WHAT IS -->
+  <section class="mt-12 grid gap-6 sm:grid-cols-2">
+    <article class="card p-6">
+      <h2 class="text-xl font-bold">What is Eventify?</h2>
+      <p class="mt-3 text-sm leading-relaxed" style="color: rgb(var(--muted))">
+        Eventify allows users to browse concerts, theatre, sports, and cultural events, book tickets instantly, 
+        and manage their orders through an intuitive interface. Administrators can manage events, users, and 
+        orders through a comprehensive dashboard.
+      </p>
+    </article>
+
+    <article class="card p-6">
+      <h2 class="text-xl font-bold">Why it exists</h2>
+      <p class="mt-3 text-sm leading-relaxed" style="color: rgb(var(--muted))">
+        The project is designed to demonstrate real-world ticketing platform architecture — including role-based
+        access, event management, booking workflows, rating systems, and clean UX patterns found in production
+        systems.
+      </p>
+    </article>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="mt-12">
+    <h2 class="text-2xl font-extrabold">Key Features</h2>
+
+    <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <article class="card p-5">
+        <h3 class="font-semibold">For users</h3>
+        <ul class="mt-3 space-y-2 text-sm" style="color: rgb(var(--muted))">
+          <li>• Browse and search live events</li>
+          <li>• Book tickets instantly</li>
+          <li>• Manage cart and orders</li>
+          <li>• Rate and comment on events</li>
+          <li>• Track purchase history</li>
+        </ul>
+      </article>
+
+      <article class="card p-5">
+        <h3 class="font-semibold">For staff & admins</h3>
+        <ul class="mt-3 space-y-2 text-sm" style="color: rgb(var(--muted))">
+          <li>• Create, edit, delete events</li>
+          <li>• Soft & hard delete workflows</li>
+          <li>• Order & ticket management</li>
+          <li>• User roles & permissions</li>
+          <li>• Analytics dashboard</li>
+        </ul>
+      </article>
+
+      <article class="card p-5">
+        <h3 class="font-semibold">Architecture</h3>
+        <ul class="mt-3 space-y-2 text-sm" style="color: rgb(var(--muted))">
+          <li>• Angular standalone components</li>
+          <li>• Signals & reactive patterns</li>
+          <li>• Guards & role-based routing</li>
+          <li>• Modular, scalable structure</li>
+          <li>• RESTful API integration</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <!-- TECH STACK -->
+  <section class="mt-12">
+    <h2 class="text-2xl font-extrabold">Technology stack</h2>
+
+    <div class="mt-6 flex flex-wrap gap-3">
+      <span class="badge">Angular 19</span>
+      <span class="badge">TypeScript</span>
+      <span class="badge">Tailwind CSS</span>
+      <span class="badge">Node.js</span>
+      <span class="badge">Express</span>
+      <span class="badge">MongoDB</span>
+      <span class="badge">REST API</span>
+      <span class="badge">Role-based access</span>
+    </div>
+  </section>
+
+  <!-- EVENT CATEGORIES -->
+  <section class="mt-12">
+    <h2 class="text-2xl font-extrabold">Event Categories</h2>
+
+    <div class="mt-6 grid gap-4 grid-cols-2 sm:grid-cols-4">
+      <div class="card p-4 text-center">
+        <div class="text-3xl mb-2">🎸</div>
+        <div class="font-semibold text-sm">Concerts</div>
+        <div class="text-xs mt-1" style="color: rgb(var(--muted))">Live music</div>
+      </div>
+
+      <div class="card p-4 text-center">
+        <div class="text-3xl mb-2">🎭</div>
+        <div class="font-semibold text-sm">Theatre</div>
+        <div class="text-xs mt-1" style="color: rgb(var(--muted))">Drama & musicals</div>
+      </div>
+
+      <div class="card p-4 text-center">
+        <div class="text-3xl mb-2">⚽</div>
+        <div class="font-semibold text-sm">Sports</div>
+        <div class="text-xs mt-1" style="color: rgb(var(--muted))">Live matches</div>
+      </div>
+
+      <div class="card p-4 text-center">
+        <div class="text-3xl mb-2">🎪</div>
+        <div class="font-semibold text-sm">Festivals</div>
+        <div class="text-xs mt-1" style="color: rgb(var(--muted))">Multi-day events</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section
+    class="mt-14 card p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+  >
+    <div>
+      <h3 class="text-lg font-bold">Ready to explore?</h3>
+      <p class="text-sm mt-1" style="color: rgb(var(--muted))">
+        Discover amazing events or check your orders.
+      </p>
+    </div>
+
+    <div class="flex gap-3">
+      <a routerLink="/events" class="btn btn-primary">Browse events</a>
+      <a routerLink="/orders" class="btn btn-ghost">Your orders</a>
+    </div>
+  </section>
+</section>

@@ -1,1 +1,318 @@
-<p>header works!</p>
+<header
+  class="sticky top-0 z-50 border-b bg-white/75 backdrop-blur shadow-sm dark:bg-zinc-950/60"
+  style="border-color: rgb(var(--border))"
+>
+  <div class="container-app">
+    <!-- Top row -->
+    <div class="flex h-16 items-center justify-between gap-3">
+      <!-- Logo -->
+      <a routerLink="/home" class="flex items-center gap-2">
+        <!-- <img src="/multi_tickets.png" alt="logo" class="h-9 w-auto rounded-xl" /> -->
+        <img src="/multi_tickets_small.png" alt="logo" class="h-9 w-auto rounded-xl" />
+        <span class="text-lg font-bold tracking-tight">Eventify</span>
+      </a>
+
+      <!-- Desktop navigation -->
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
+        <a
+          routerLink="/events"
+          routerLinkActive="nav-active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="nav-link"
+        >
+          Events
+        </a>
+
+        <a
+          routerLink="/search-events"
+          routerLinkActive="nav-active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="nav-link"
+        >
+          Search
+        </a>
+
+        <a
+          routerLink="/cart"
+          routerLinkActive="nav-active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="nav-link flex items-center gap-2"
+        >
+          Tickets
+          <span
+            class="inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold"
+            style="background: rgba(99, 102, 241, 0.14); color: rgb(var(--fg))"
+          >
+            {{ cartItemsCount() }}
+          </span>
+        </a>
+
+        @if (isStaff()) {
+          <div class="relative group">
+            <!-- Trigger -->
+            <button
+              type="button"
+              class="nav-link inline-flex items-center gap-1"
+              aria-haspopup="menu"
+            >
+              Admin
+              <span class="text-[10px]" style="color: rgb(var(--muted))">▾</span>
+            </button>
+
+            <!-- Panel -->
+            <div
+              class="absolute left-1/2 top-full -translate-x-1/2 pt-2 px-2 opacity-0 scale-95 translate-y-1 pointer-events-none group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition duration-150 ease-out z-50"
+            >
+              <div class="card p-2 w-64">
+                <div
+                  class="px-3 pt-2 pb-1 text-xs font-semibold uppercase tracking-wide"
+                  style="color: rgb(var(--muted))"
+                >
+                  Admin
+                </div>
+
+                <a
+                  routerLink="/admin/dashboard"
+                  routerLinkActive="mobile-active"
+                  [routerLinkActiveOptions]="{ exact: true }"
+                  class="mobile-link block w-full"
+                >
+                  Dashboard
+                </a>
+
+                <a
+                  routerLink="/admin/users"
+                  routerLinkActive="mobile-active"
+                  [routerLinkActiveOptions]="{ exact: true }"
+                  class="mobile-link block w-full"
+                >
+                  Users
+                </a>
+
+                <a
+                  routerLink="/admin/events"
+                  routerLinkActive="mobile-active"
+                  [routerLinkActiveOptions]="{ exact: true }"
+                  class="mobile-link block w-full"
+                >
+                  Events
+                </a>
+
+                <div class="my-2 h-px" style="background: rgb(var(--border))"></div>
+
+                <a
+                  routerLink="/create-event"
+                  routerLinkActive="mobile-active"
+                  class="mobile-link block w-full font-semibold"
+                >
+                  Add event
+                </a>
+              </div>
+            </div>
+          </div>
+        }
+      </nav>
+
+      <!-- Right actions -->
+      <div class="flex items-center gap-2">
+        <!-- Theme toggle -->
+        <button
+          type="button"
+          class="btn btn-ghost px-3"
+          (click)="theme.toggle()"
+          [attr.aria-label]="
+            theme.theme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'
+          "
+          [attr.title]="theme.theme() === 'dark' ? 'Light mode' : 'Dark mode'"
+        >
+          <span class="text-base">
+            {{ theme.theme() === 'dark' ? '☀️' : '🌙' }}
+          </span>
+        </button>
+
+        <!-- Desktop auth -->
+        <div class="hidden md:flex items-center gap-3 text-sm">
+          @if (isLoggedIn()) {
+            <a
+              routerLink="/orders"
+              routerLinkActive="nav-active"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="nav-link"
+            >
+              <!-- {{ isStaff() ? 'All Orders' : 'My Tickets' }} -->
+              {{ ordersLabel() }}
+            </a>
+            <button class="btn btn-ghost" (click)="logout()" [disabled]="isLoading()">
+              @if (isLoading()) {
+                Logging out...
+              } @else {
+                Logout
+              }
+            </button>
+          } @else {
+            <a
+              routerLink="/login"
+              routerLinkActive="nav-active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              class="nav-link"
+            >
+              Login
+            </a>
+            <a
+              routerLink="/register"
+              routerLinkActive="nav-active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              class="nav-link"
+              >Register</a
+            >
+          }
+        </div>
+
+        <!-- Mobile hamburger -->
+        <button
+          type="button"
+          class="md:hidden btn btn-ghost px-3"
+          (click)="isMenuOpen = !isMenuOpen"
+          aria-label="Open menu"
+        >
+          <span class="text-lg">☰</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile menu panel -->
+    @if (isMenuOpen) {
+      <div class="md:hidden pb-4">
+        <div class="card p-3 mt-3">
+          <div class="flex flex-col gap-1">
+            <a
+              routerLink="/events"
+              routerLinkActive="mobile-active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              class="mobile-link"
+              (click)="closeMenu()"
+            >
+              Events
+            </a>
+
+            <a
+              routerLink="/search-events"
+              routerLinkActive="mobile-active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              class="mobile-link"
+              (click)="closeMenu()"
+            >
+              Search
+            </a>
+
+            <a
+              routerLink="/cart"
+              routerLinkActive="mobile-active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              class="mobile-link flex items-center justify-between"
+              (click)="closeMenu()"
+            >
+              <span>Tickets</span>
+              <span
+                class="inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold"
+                style="background: rgba(99, 102, 241, 0.14); color: rgb(var(--fg))"
+              >
+                {{ cartItemsCount() }}
+              </span>
+            </a>
+
+            @if (isStaff()) {
+              <div class="my-2 h-px" style="background: rgb(var(--border))"></div>
+
+              <a
+                routerLink="/admin/dashboard"
+                routerLinkActive="mobile-active"
+                [routerLinkActiveOptions]="{ exact: false }"
+                class="mobile-link"
+                (click)="closeMenu()"
+              >
+                Admin Dashboard
+              </a>
+
+              <a
+                routerLink="/admin/users"
+                routerLinkActive="mobile-active"
+                [routerLinkActiveOptions]="{ exact: true }"
+                class="mobile-link"
+                (click)="closeMenu()"
+              >
+                Admin / Users
+              </a>
+
+              <a
+                routerLink="/admin/events"
+                routerLinkActive="mobile-active"
+                [routerLinkActiveOptions]="{ exact: true }"
+                class="mobile-link"
+                (click)="closeMenu()"
+              >
+                Admin / Events
+              </a>
+
+              <a
+                routerLink="/create-event"
+                routerLinkActive="mobile-active"
+                [routerLinkActiveOptions]="{ exact: true }"
+                class="mobile-link"
+                (click)="closeMenu()"
+              >
+                Add event
+              </a>
+            }
+
+            <div class="my-2 h-px" style="background: rgb(var(--border))"></div>
+
+            @if (isLoggedIn()) {
+              <a
+                routerLink="/orders"
+                routerLinkActive="mobile-active"
+                [routerLinkActiveOptions]="{ exact: false }"
+                class="mobile-link"
+                (click)="closeMenu()"
+              >
+                {{ isStaff() ? 'All Orders' : 'My Tickets' }}
+              </a>
+
+              <button
+                class="btn btn-ghost justify-start w-full"
+                (click)="logout()"
+                [disabled]="isLoading()"
+              >
+                @if (isLoading()) {
+                  Logging out...
+                } @else {
+                  Logout
+                }
+              </button>
+            } @else {
+              <a
+                routerLink="/login"
+                routerLinkActive="mobile-active"
+                [routerLinkActiveOptions]="{ exact: true }"
+                class="mobile-link"
+                (click)="closeMenu()"
+              >
+                Login
+              </a>
+
+              <a
+                routerLink="/register"
+                routerLinkActive="mobile-active"
+                [routerLinkActiveOptions]="{ exact: true }"
+                class="mobile-link"
+                (click)="closeMenu()"
+              >
+                Register
+              </a>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</header>

@@ -1,1 +1,140 @@
-<p>event-item works!</p>
+<article class="card overflow-hidden group">
+  <!-- Image -->
+  <a [routerLink]="['/details-event', event()._id]" class="block">
+    <div class="relative overflow-hidden rounded-t-2xl">
+      <img
+        class="card-image h-[210px] w-full object-cover sm:h-[260px]"
+        [src]="event().imageUrl"
+        [alt]="event().title"
+      />
+
+      <div
+        class="pointer-events-none absolute inset-x-0 bottom-0 h-24"
+        style="background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent)"
+      ></div>
+
+      <!-- Rating pill (top left) -->
+      @if (event().ratingCount) {
+      <div
+        class="absolute left-3 top-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold"
+        style="background: rgba(0, 0, 0, 0.55); color: white"
+      >
+        <span>★</span>
+        <span>{{ event().ratingAvg | number : '1.1-2' }}</span>
+        <span style="opacity: 0.8">({{ event().ratingCount }})</span>
+      </div>
+      }
+
+      <!-- Sold Out badge (top right) -->
+      @if (isSoldOut()) {
+      <div
+        class="absolute right-3 top-3 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide"
+        style="background: rgba(220, 38, 38, 0.9); color: white"
+      >
+        Sold Out
+      </div>
+      }
+
+      <!-- Genre badge (bottom left) -->
+      <div
+        class="absolute left-3 bottom-3 rounded-full px-3 py-1 text-xs font-semibold"
+        style="background: rgba(0, 0, 0, 0.7); color: white; backdrop-filter: blur(4px)"
+      >
+        {{ event().genre }}
+      </div>
+    </div>
+  </a>
+
+  <!-- Body -->
+  <div class="p-3 sm:p-4 flex flex-col" style="min-height: 260px">
+    <!-- Title & Price Row -->
+    <div class="flex items-start justify-between gap-3 mb-3">
+      <div class="min-w-0 flex-1">
+        <h3 class="text-base font-bold leading-snug line-clamp-2" style="min-height: 2.5rem">
+          <a [routerLink]="['/details-event', event()._id]" class="hover:underline">
+            {{ event().title }}
+          </a>
+        </h3>
+      </div>
+
+      <!-- Price -->
+      <div class="text-right shrink-0">
+        <div class="text-base font-extrabold">{{ event().price | number : '1.2-2' }} €</div>
+
+        @if (hasPreviousPrice()) {
+        <div class="mt-0.5 text-xs" style="color: rgb(var(--muted))">
+          <span class="line-through">{{ event().previousPrice | number : '1.2-2' }} €</span>
+
+          <span
+            class="ml-1 inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-bold"
+            [class.down]="isDown()"
+            [class.up]="!isDown()"
+          >
+            @if (isDown()) { -{{ priceChangePercent() * -1 | number : '1.0-0' }}% } @else { +{{
+              priceChangePercent() | number : '1.0-0'
+            }}% }
+          </span>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Event Info (Date, Venue, Availability) -->
+    <div class="space-y-2 mb-3">
+      <!-- Date & Time -->
+      @if (formattedDate()) {
+      <div class="flex items-center gap-2 text-xs">
+        <span style="color: rgb(var(--muted))">📅</span>
+        <span class="font-medium">{{ formattedDate() }}</span>
+        @if (formattedTime()) {
+        <span style="color: rgb(var(--muted))">•</span>
+        <span style="color: rgb(var(--muted))">{{ formattedTime() }}</span>
+        }
+      </div>
+      }
+
+      <!-- Venue & Location -->
+      @if (event().venue && event().location) {
+      <div class="flex items-start gap-2 text-xs">
+        <span class="shrink-0" style="color: rgb(var(--muted))">📍</span>
+        <span class="line-clamp-1" style="color: rgb(var(--muted))">
+          {{ event().venue }}, {{ event().location }}
+        </span>
+      </div>
+      }
+
+      <!-- Ticket Availability -->
+      <div class="flex items-center gap-2 text-xs">
+        <span style="color: rgb(var(--muted))">🎫</span>
+        <span 
+          class="font-medium"
+          [class.text-red-600]="isSoldOut()"
+          [class.text-orange-600]="isLowStock() && !isSoldOut()"
+        >
+          {{ ticketStatusLabel() }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-2 sm:gap-3 w-full mt-auto">
+      <a class="btn btn-ghost flex-1" [routerLink]="['/details-event', event()._id]"> Details </a>
+
+      <button
+        type="button"
+        class="btn flex-1"
+        [class.btn-primary]="!inCart() && !isSoldOut()"
+        [class.btn-accent-soft]="inCart()"
+        [class.btn-ghost]="isSoldOut()"
+        [disabled]="isSoldOut()"
+        (click)="onToggleCart()"
+      >
+        @if (isSoldOut()) {
+          Sold Out
+        } @else {
+          {{ inCart() ? 'Added ✓' : 'Book now' }}
+        }
+      </button>
+    </div>
+  </div>
+</article>

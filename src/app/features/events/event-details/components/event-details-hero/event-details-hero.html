@@ -1,1 +1,272 @@
-<p>event-details-hero works!</p>
+<section class="container-app py-8 sm:py-10">
+  @if (loading()) {
+  <div class="card p-6">
+    <p style="color: rgb(var(--muted))">Loading…</p>
+  </div>
+  } @else {
+  <div class="grid gap-6 lg:grid-cols-12">
+    <!-- Left: Image + Rating -->
+    <div class="lg:col-span-5 flex flex-col gap-4">
+      <!-- Image -->
+      <div class="card overflow-hidden">
+        <div class="relative overflow-hidden">
+          <img
+            class="w-full h-[260px] sm:h-[400px] object-cover card-image"
+            [src]="event()?.imageUrl"
+            [alt]="event()?.title || 'Event'"
+          />
+          <div
+            class="pointer-events-none absolute inset-x-0 bottom-0 h-28"
+            style="background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent)"
+          ></div>
+
+          <!-- Genre badge -->
+          <div class="absolute left-3 bottom-3">
+            <span
+              class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold"
+              style="background: rgba(0, 0, 0, 0.7); color: white; backdrop-filter: blur(4px)"
+            >
+              {{ event()?.genre }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rating Card (Desktop only - shown in left column) -->
+      <div class="card p-5 hidden lg:block">
+        <div class="flex items-center justify-between gap-3 mb-3">
+          <div>
+            <h3 class="text-base font-bold">Rating</h3>
+            @if (event()?.ratingCount) {
+            <p class="mt-1 text-sm flex items-center gap-2">
+              <span class="text-lg font-bold">★ {{ event()?.ratingAvg | number : '1.1-2' }}</span>
+              <span style="color: rgb(var(--muted))">({{ event()?.ratingCount }} ratings)</span>
+            </p>
+            } @else {
+            <p class="mt-1 text-sm" style="color: rgb(var(--muted))">No ratings yet</p>
+            }
+          </div>
+        </div>
+
+        <!-- Rating Stars (if logged in) -->
+        @if (userId()) {
+        <div class="pt-3" style="border-top: 1px solid rgb(var(--border))">
+          <p class="text-xs font-medium mb-2" style="color: rgb(var(--muted))">Your rating:</p>
+          <div class="details-stars" role="radiogroup" aria-label="Rate this event">
+            @for (star of [1,2,3,4,5]; track star) {
+            <button
+              type="button"
+              class="details-star text-2xl"
+              [class.is-filled]="userRating() >= star"
+              (click)="onRate(star)"
+              [attr.aria-label]="'Rate ' + star + ' out of 5'"
+            >
+              ★
+            </button>
+            }
+          </div>
+          @if (userRating() > 0) {
+          <p class="text-xs mt-2" style="color: rgb(var(--muted))">You rated: {{ userRating() }}/5</p>
+          }
+        </div>
+        } @else {
+        <p class="text-xs pt-3" style="color: rgb(var(--muted)); border-top: 1px solid rgb(var(--border))">
+          Log in to rate this event
+        </p>
+        }
+      </div>
+    </div>
+
+    <!-- Right: Event Info -->
+    <div class="lg:col-span-7 flex flex-col">
+      <div class="card p-5 sm:p-6 flex-1 flex flex-col">
+        <!-- Title & Price -->
+        <div class="flex items-start justify-between gap-4 pb-4" style="border-bottom: 1px solid rgb(var(--border))">
+          <div class="flex-1">
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight leading-tight">
+              {{ event()?.title }}
+            </h1>
+            <p class="mt-2 text-sm" style="color: rgb(var(--muted))">
+              {{ event()?.genre }} • {{ event()?.country }}
+            </p>
+          </div>
+
+          <div class="text-right shrink-0">
+            <div class="text-2xl sm:text-3xl font-extrabold">{{ event()?.price | number : '1.2-2' }} €</div>
+
+            @if (priceInfo()?.prev !== null) {
+            <div class="mt-1 text-sm" style="color: rgb(var(--muted))">
+              <span class="line-through">{{ priceInfo()?.prev | number : '1.2-2' }} €</span>
+
+              <span
+                class="ml-2 inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-bold"
+                [class.down]="priceInfo()?.isDown"
+                [class.up]="priceInfo()?.isUp"
+              >
+                @if (priceInfo()?.isDown) { -{{ priceInfo()?.pct }}% } @else { +{{ priceInfo()?.pct }}% }
+              </span>
+            </div>
+            }
+          </div>
+        </div>
+
+        <!-- Event Details Grid -->
+        <div class="py-5" style="border-bottom: 1px solid rgb(var(--border))">
+          <!-- Date/Time + Tickets Row -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <!-- Date & Time -->
+            @if (event()?.eventDate) {
+            <div class="flex items-start gap-3">
+              <span class="text-xl shrink-0">📅</span>
+              <div class="flex-1">
+                <p class="text-xs font-semibold uppercase tracking-wide" style="color: rgb(var(--muted))">Date & Time</p>
+                <p class="text-sm font-medium mt-1">{{ formatDate(event()!.eventDate) }}</p>
+                @if (event()?.eventTime) {
+                <p class="text-xs mt-0.5" style="color: rgb(var(--muted))">{{ event()!.eventTime }}</p>
+                }
+              </div>
+            </div>
+            }
+
+            <!-- Ticket Availability -->
+            <div class="flex items-start gap-3">
+              <span class="text-xl shrink-0">🎫</span>
+              <div class="flex-1">
+                <p class="text-xs font-semibold uppercase tracking-wide" style="color: rgb(var(--muted))">Tickets</p>
+                @if (event() && event()?.availableTickets === 0) {
+                <p class="text-sm font-bold mt-1 text-red-600">SOLD OUT</p>
+                } @else if (event()) {
+                <p class="text-sm font-medium mt-1">
+                  {{ event()!.availableTickets.toLocaleString() }} available
+                </p>
+                <p class="text-xs mt-0.5" style="color: rgb(var(--muted))">
+                  of {{ event()!.totalTickets.toLocaleString() }} total
+                </p>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Venue & Location (full width) -->
+          @if (event()?.venue && event()?.location) {
+          <div class="flex items-start gap-3">
+            <span class="text-xl shrink-0">📍</span>
+            <div class="flex-1">
+              <p class="text-xs font-semibold uppercase tracking-wide" style="color: rgb(var(--muted))">Venue</p>
+              <p class="text-sm font-medium mt-1">{{ event()!.venue }}</p>
+              <p class="text-xs mt-0.5" style="color: rgb(var(--muted))">{{ event()!.location }}</p>
+            </div>
+          </div>
+          }
+        </div>
+
+        <!-- Description -->
+        <div class="py-5 flex-1" style="border-bottom: 1px solid rgb(var(--border))">
+          <h3 class="text-sm font-semibold uppercase tracking-wide mb-2" style="color: rgb(var(--muted))">About</h3>
+          <p class="text-sm leading-relaxed">
+            {{ event()?.details }}
+          </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="pt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button
+            type="button"
+            class="btn btn-primary w-full"
+            [disabled]="!event() || (event() && event()?.availableTickets === 0)"
+            (click)="toggleCart.emit()"
+          >
+            @if (event() && event()?.availableTickets === 0) {
+              Sold Out
+            } @else {
+              {{ inCart() ? 'Remove from cart' : 'Book tickets' }}
+            }
+          </button>
+
+          <a class="btn btn-ghost w-full text-center" routerLink="/events">
+            Back to events
+          </a>
+        </div>
+
+        <!-- Staff Actions -->
+        @if (isStaff() && event()) {
+        <div class="mt-5 pt-5" style="border-top: 1px solid rgb(var(--border))">
+          <p class="text-xs font-semibold uppercase tracking-wide mb-3" style="color: rgb(var(--muted))">Staff Actions</p>
+          <div class="flex flex-wrap gap-2">
+            @if (!event()?.isDeleted) {
+            <a class="btn btn-ghost" [routerLink]="['/edit-event', event()?._id]">Edit</a>
+
+            <button
+              type="button"
+              class="btn btn-ghost btn-danger-soft"
+              (click)="onOpenDelete('soft')"
+            >
+              Soft delete
+            </button>
+
+            <button
+              type="button"
+              class="btn btn-ghost btn-danger-soft"
+              (click)="onOpenDelete('hard')"
+            >
+              Hard delete
+            </button>
+            } @else {
+            <button type="button" class="btn btn-ghost" (click)="restore.emit()">Restore</button>
+
+            <button type="button" class="btn btn-ghost btn-danger-soft" (click)="onOpenDelete('hard')">
+              Hard delete
+            </button>
+            }
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Rating Card (Mobile only - shown below event info) -->
+    <div class="lg:hidden card p-5">
+      <div class="flex items-center justify-between gap-3 mb-3">
+        <div>
+          <h3 class="text-base font-bold">Rating</h3>
+          @if (event()?.ratingCount) {
+          <p class="mt-1 text-sm flex items-center gap-2">
+            <span class="text-lg font-bold">★ {{ event()?.ratingAvg | number : '1.1-2' }}</span>
+            <span style="color: rgb(var(--muted))">({{ event()?.ratingCount }} ratings)</span>
+          </p>
+          } @else {
+          <p class="mt-1 text-sm" style="color: rgb(var(--muted))">No ratings yet</p>
+          }
+        </div>
+      </div>
+
+      <!-- Rating Stars (if logged in) -->
+      @if (userId()) {
+      <div class="pt-3" style="border-top: 1px solid rgb(var(--border))">
+        <p class="text-xs font-medium mb-2" style="color: rgb(var(--muted))">Your rating:</p>
+        <div class="details-stars" role="radiogroup" aria-label="Rate this event">
+          @for (star of [1,2,3,4,5]; track star) {
+          <button
+            type="button"
+            class="details-star text-2xl"
+            [class.is-filled]="userRating() >= star"
+            (click)="onRate(star)"
+            [attr.aria-label]="'Rate ' + star + ' out of 5'"
+          >
+            ★
+          </button>
+          }
+        </div>
+        @if (userRating() > 0) {
+        <p class="text-xs mt-2" style="color: rgb(var(--muted))">You rated: {{ userRating() }}/5</p>
+        }
+      </div>
+      } @else {
+      <p class="text-xs pt-3" style="color: rgb(var(--muted)); border-top: 1px solid rgb(var(--border))">
+        Log in to rate this event
+      </p>
+      }
+    </div>
+  </div>
+  }
+</section>

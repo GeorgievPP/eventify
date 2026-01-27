@@ -1,1 +1,58 @@
-<p>admin-users-toolbar works!</p>
+<section class="card p-4 sm:p-5 mb-6">
+  <div class="grid gap-4 sm:grid-cols-12 sm:items-end">
+    <!-- Search -->
+    <div class="sm:col-span-6">
+      <label class="block text-sm font-medium mb-2">Search</label>
+      <input
+        class="input"
+        type="text"
+        placeholder="Search by email…"
+        [value]="searchTerm()"
+        (input)="onSearch($any($event.target).value)"
+      />
+    </div>
+
+    <!-- Status Filter -->
+    <div class="sm:col-span-3">
+      <label class="block text-sm font-medium mb-2">Status</label>
+      <select
+        class="input"
+        [ngModel]="statusFilter()"
+        (ngModelChange)="onStatusChange($event)"
+      >
+        <option [ngValue]="'all'">All Users</option>
+        <option [ngValue]="'active'">Active Only</option>
+        <option [ngValue]="'deleted'">Deleted Only</option>
+      </select>
+    </div>
+
+    <!-- Reset Button -->
+    <div class="sm:col-span-3">
+      <button 
+        type="button" 
+        class="btn btn-ghost w-full" 
+        (click)="onReset()"
+        [disabled]="!searchTerm() && statusFilter() === 'all'"
+      >
+        Reset Filters
+      </button>
+    </div>
+  </div>
+
+  <!-- Results Summary -->
+  <div class="mt-4 flex items-center gap-4 text-sm">
+    <span>
+      Showing: <strong class="font-semibold">{{ resultsCount() }}</strong>
+      @if (resultsCount() !== totalCount()) {
+        <span style="color: rgb(var(--muted))">of {{ totalCount() }}</span>
+      }
+    </span>
+    
+    @if (resultsCount() !== totalCount() && resultsCount() > 0) {
+    <span style="color: rgb(var(--muted))">•</span>
+    <span style="color: rgb(var(--muted))">
+      {{ totalCount() - resultsCount() }} filtered out
+    </span>
+    }
+  </div>
+</section>

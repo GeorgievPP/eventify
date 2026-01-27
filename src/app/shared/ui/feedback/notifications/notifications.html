@@ -1,1 +1,47 @@
-<p>notifications works!</p>
+<div class="toast-stack" aria-live="polite" aria-atomic="true">
+  @for (notif of notifications(); track notif.id) {
+    <div class="toast" [ngClass]="'toast--' + notif.type" role="status">
+      <div class="toast__icon" aria-hidden="true">
+        @if (notif.type === 'success') {
+          ✓
+        } @else if (notif.type === 'error') {
+          !
+        } @else if (notif.type === 'warning') {
+          ⚠
+        } @else {
+          i
+        }
+      </div>
+
+      <div class="toast__content">
+        <div class="toast__title">
+          @if (notif.type === 'success') {
+            Success
+          } @else if (notif.type === 'error') {
+            Error
+          } @else if (notif.type === 'warning') {
+            Warning
+          } @else {
+            Info
+          }
+        </div>
+
+        <div class="toast__message">{{ notif.message }}</div>
+      </div>
+
+      <button
+        type="button"
+        class="toast__close"
+        (click)="close(notif.id)"
+        aria-label="Close notification"
+        title="Close"
+      >
+        ✕
+      </button>
+
+      <!-- <div class="toast__bar" aria-hidden="true"></div> -->
+      <div class="toast__progress" aria-hidden="true"></div>
+
+    </div>
+  }
+</div>

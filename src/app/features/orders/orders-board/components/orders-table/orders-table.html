@@ -1,1 +1,23 @@
-<p>orders-table works!</p>
+@if (rows().length > 0) {
+<section class="card p-0 mt-6 overflow-hidden">
+  <ng-template #orderActions let-row>
+    <a [routerLink]="['/orders', row.id]" class="btn btn-ghost px-3 py-1.5 text-xs">
+      View details
+    </a>
+  </ng-template>
+
+  <div class="orders-table-wrapper">
+    <div class="table-scroll">
+      <app-data-table
+        [columns]="columns()"
+        [rows]="rows()"
+        rowKey="id"
+        emptyMessage="You have no orders."
+        [actionsTemplate]="orderActions"
+        [rowLink]="rowLink()"
+        [rowClickable]="rowClickable()"
+      ></app-data-table>
+    </div>
+  </div>
+</section>
+}

@@ -1,1 +1,190 @@
-<p>order-history works!</p>
+<section class="card p-5 sm:p-6 mt-6">
+  <div class="flex items-center justify-between gap-3">
+    <h2 class="text-lg font-bold">Order History</h2>
+
+    @if (!loading() && history().length > 0) {
+    <button type="button" class="btn btn-ghost px-3 py-1.5 text-sm" (click)="toggleSort()">
+      @if (sortOrder() === 'desc') {
+        Newest First ↓
+      } @else {
+        Oldest First ↑
+      }
+    </button>
+    }
+  </div>
+
+  @if (loading()) {
+  <div class="mt-6 text-center py-8">
+    <p style="color: rgb(var(--muted))">Loading history…</p>
+  </div>
+  } @else if (history().length === 0) {
+  <div class="mt-6 text-center py-8">
+    <div class="text-4xl mb-3">📝</div>
+    <p class="font-semibold">No history entries</p>
+    <p class="text-sm mt-1" style="color: rgb(var(--muted))">
+      Order history will appear here as changes are made.
+    </p>
+  </div>
+  } @else {
+  
+  <!-- Timeline -->
+  <div class="mt-6 relative">
+    <!-- Timeline Line -->
+    <div 
+      class="absolute left-[15px] top-4 bottom-4 w-0.5"
+      style="background: linear-gradient(to bottom, rgb(var(--accent)), transparent)"
+    ></div>
+
+    <ul class="space-y-4 relative">
+      @for (entry of sortedHistory(); track entry._id; let isLast = $last) {
+      <li class="relative pl-12">
+        <!-- Timeline Dot -->
+        <div 
+          class="absolute left-0 top-2 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
+          style="background: rgba(var(--accent), 0.15); border: 2px solid rgb(var(--accent))"
+        >
+          {{ getActionEmoji(entry.action) }}
+        </div>
+
+        <!-- Entry Card -->
+        <div 
+          class="rounded-xl p-4 transition-all hover:shadow-sm"
+          style="border: 1px solid rgb(var(--border)); background: rgba(var(--card-bg), 1)"
+        >
+          <!-- Header -->
+          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+            <div class="flex-1 min-w-0">
+              <p class="font-bold text-base">{{ entry.action }}</p>
+              
+              @if (entry.fromStatus || entry.toStatus) {
+              <div class="mt-2 flex items-center gap-2 flex-wrap">
+                <span 
+                  class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold border"
+                  [class]="getStatusColorClass(entry.fromStatus)"
+                >
+                  {{ formatStatus(entry.fromStatus) }}
+                </span>
+                <span style="color: rgb(var(--muted))">→</span>
+                <span 
+                  class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold border"
+                  [class]="getStatusColorClass(entry.toStatus)"
+                >
+                  {{ formatStatus(entry.toStatus) }}
+                </span>
+              </div>
+              }
+
+              <p class="mt-2 text-sm" style="color: rgb(var(--muted))">
+                <span>{{ formatDate(entry.createdAt) }}</span>
+                @if (entry.userId && entry.userId.email) {
+                  <span class="ml-2">• by <strong>{{ entry.userId.email }}</strong></span>
+                  <!-- <span class="ml-2">• by <strong>{{ entry.userId?.email }}</strong></span> -->
+                }
+              </p>
+            </div>
+
+            <!-- Expand Button -->
+            @if (hasDetails(entry)) {
+            <button 
+              type="button" 
+              class="btn btn-ghost px-3 py-1.5 text-sm flex-shrink-0"
+              (click)="toggleDetails(entry._id)"
+            >
+              Details
+              <span 
+                class="ml-1 inline-block transition-transform"
+                [style.transform]="isExpanded(entry._id) ? 'rotate(180deg)' : 'rotate(0deg)'"
+              >
+                ▼
+              </span>
+            </button>
+            }
+          </div>
+
+          <!-- Expanded Details -->
+          @if (isExpanded(entry._id)) {
+          <div 
+            class="mt-4 pt-4 space-y-3"
+            style="border-top: 1px solid rgb(var(--border))"
+          >
+            @let diff = compareHistoryItems(entry);
+            
+            @if (diff) {
+            <!-- Added Items -->
+            @if (diff.added.length > 0) {
+            <div>
+              <p class="text-sm font-bold mb-2 flex items-center gap-2">
+                <span class="text-green-500">+</span> Added Items
+              </p>
+              <ul class="space-y-1 text-sm" style="color: rgb(var(--muted))">
+                @for (a of diff.added; track a.postId) {
+                <li class="flex items-center gap-2">
+                  <span>✓</span>
+                  <span>{{ a.title }} <strong>x{{ a.quantity }}</strong></span>
+                </li>
+                }
+              </ul>
+            </div>
+            }
+
+            <!-- Removed Items -->
+            @if (diff.removed.length > 0) {
+            <div>
+              <p class="text-sm font-bold mb-2 flex items-center gap-2">
+                <span class="text-red-500">−</span> Removed Items
+              </p>
+              <ul class="space-y-1 text-sm" style="color: rgb(var(--muted))">
+                @for (r of diff.removed; track r.postId) {
+                <li class="flex items-center gap-2">
+                  <span>✗</span>
+                  <span>{{ r.title }} <strong>x{{ r.quantity }}</strong></span>
+                </li>
+                }
+              </ul>
+            </div>
+            }
+
+            <!-- Changed Quantities -->
+            @if (diff.changed.length > 0) {
+            <div>
+              <p class="text-sm font-bold mb-2 flex items-center gap-2">
+                <span>↕️</span> Updated Quantities
+              </p>
+              <ul class="space-y-1 text-sm" style="color: rgb(var(--muted))">
+                @for (c of diff.changed; track c.title) {
+                <li class="flex items-center gap-2">
+                  <span>{{ c.title }}:</span>
+                  <strong>{{ c.before }}</strong>
+                  <span>→</span>
+                  <strong>{{ c.after }}</strong>
+                </li>
+                }
+              </ul>
+            </div>
+            }
+            }
+
+            <!-- Total Price Change -->
+            @if (isTotalPriceChanged(entry)) {
+            @let beforeTotal = calcTotalFromSnapshot(entry.before);
+            @let afterTotal = calcTotalFromSnapshot(entry.after);
+
+            <div 
+              class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold"
+              style="background: rgba(var(--accent), 0.12); border: 1px solid rgba(var(--accent), 0.3)"
+            >
+              <span>Total:</span>
+              <span>{{ formatCurrency(beforeTotal!) }} €</span>
+              <span style="opacity: 0.6">→</span>
+              <span>{{ formatCurrency(afterTotal!) }} €</span>
+            </div>
+            }
+          </div>
+          }
+        </div>
+      </li>
+      }
+    </ul>
+  </div>
+  }
+</section>

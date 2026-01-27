@@ -1,1 +1,161 @@
-<p>event-search-filters works!</p>
+<section class="card p-4 sm:p-6">
+  <form class="grid gap-4 sm:grid-cols-12" [formGroup]="form">
+    <!-- Title -->
+    <div class="sm:col-span-6">
+      <label class="block text-sm font-medium mb-1">Title</label>
+      <input
+        class="input"
+        type="text"
+        formControlName="title"
+        placeholder="Search by title..."
+        (input)="onTitleInput()"
+      />
+    </div>
+
+    <!-- Country -->
+    <div class="sm:col-span-4">
+      <label class="block text-sm font-medium mb-1">Country</label>
+
+      <div
+        class="relative"
+        appClickOutside
+        (clickOutside)="countryOpen = false"
+        (esc)="countryOpen = false"
+      >
+        <!-- Trigger -->
+        <button
+          type="button"
+          class="input flex items-center justify-between gap-3"
+          (click)="toggleCountry()"
+          [attr.aria-expanded]="countryOpen"
+          aria-haspopup="listbox"
+        >
+          <span class="truncate">{{ countryLabel() }}</span>
+          <span class="text-xs" style="color: rgb(var(--muted))">▾</span>
+        </button>
+
+        <!-- Panel -->
+        @if (countryOpen) {
+        <div
+          class="absolute z-50 mt-2 w-full card p-1 max-h-64 overflow-auto"
+          role="listbox"
+          aria-label="Country options"
+        >
+          <button
+            type="button"
+            class="mobile-link w-full text-left"
+            [class.mobile-active]="!countryValue()"
+            (click)="selectCountry('')"
+          >
+            All countries
+          </button>
+
+          @for (c of countries(); track c) {
+          <button
+            type="button"
+            class="mobile-link w-full text-left"
+            [class.mobile-active]="countryValue() === c"
+            (click)="selectCountry(c)"
+          >
+            {{ c }}
+          </button>
+          }
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Price slider -->
+    @if (globalMaxPrice() > 0) {
+    <div class="sm:col-span-12">
+      <div class="mt-2">
+        <div class="flex items-center justify-between gap-3">
+          <label class="text-sm font-medium">
+            Max price:
+            <span class="font-semibold">
+              <strong>{{ maxPrice() ?? sliderMax() | number : '1.2-2' }} €</strong>
+            </span>
+          </label>
+
+          <!-- ✅ показва се само ако има активни филтри -->
+          @if (hasAnyActiveFilters()) {
+          <button
+            type="button"
+            class="btn btn-ghost btn-reset px-3 py-1.5 text-xs"
+            (click)="clearAll()"
+          >
+            Reset
+          </button>
+          }
+        </div>
+
+        <input
+          id="max-price"
+          class="range mt-3"
+          type="range"
+          min="0"
+          step="0.01"
+          [max]="sliderMax()"
+          [value]="maxPrice() ?? sliderMax()"
+          (input)="onMaxPriceChange($any($event.target).valueAsNumber)"
+        />
+      </div>
+    </div>
+    }
+  </form>
+
+  <!-- Genre chips -->
+  @if (genres().length > 0) {
+  <div class="mt-5">
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="text-sm font-medium mr-1" style="color: rgb(var(--muted))">Genres:</span>
+
+      @for (g of genres(); track g) {
+      <button
+        type="button"
+        class="btn px-3 py-1.5 text-xs"
+        [class.btn-primary]="selectedGenres().includes(g)"
+        [class.btn-accent-soft]="!selectedGenres().includes(g)"
+        (click)="toggleGenre(g)"
+      >
+        {{ g }}
+      </button>
+      }
+    </div>
+  </div>
+  }
+
+  <!-- ✅ Active filters (върнато както беше) -->
+  @if (hasAnyActiveFilters()) {
+  <div class="mt-5 flex flex-wrap items-center gap-2">
+    <span class="text-sm font-medium mr-1" style="color: rgb(var(--muted))">Active:</span>
+
+    @if (selectedGenres().length) {
+    <span class="badge inline-flex items-center gap-2">
+      Genres: {{ selectedGenres().join(', ') }}
+      <button type="button" class="btn btn-ghost px-2 py-0.5 text-xs" (click)="clearGenres()">
+        ×
+      </button>
+    </span>
+    } @if (countryValue()) {
+    <span class="badge inline-flex items-center gap-2">
+      Country: {{ countryValue() }}
+      <button type="button" class="btn btn-ghost px-2 py-0.5 text-xs" (click)="clearCountry()">
+        ×
+      </button>
+    </span>
+    } @if (hasActivePriceFilter()) {
+    <span class="badge inline-flex items-center gap-2">
+      Max: {{ maxPrice() | number : '1.2-2' }} €
+      <button type="button" class="btn btn-ghost px-2 py-0.5 text-xs" (click)="clearPrice()">
+        ×
+      </button>
+    </span>
+    }
+
+    <span class="flex-1"></span>
+
+    <button type="button" class="btn btn-ghost" (click)="clearAll()">Clear all</button>
+  </div>
+  }
+</section>

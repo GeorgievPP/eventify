@@ -1,1 +1,30 @@
-<p>pagination works!</p>
+<nav class="mt-10 flex flex-wrap items-center justify-center gap-2">
+  <button 
+    type="button" 
+    class="btn btn-ghost" 
+    (click)="prev()" 
+    [disabled]="isFirstPage()"
+  >
+    ‹ Prev
+  </button>
+
+  @for (p of pages(); track p) {
+  <button
+    type="button"
+    class="btn btn-ghost"
+    (click)="go(p)"
+    [class.btn-primary]="current() === p"
+  >
+    {{ p }}
+  </button>
+  }
+
+  <button
+    type="button"
+    class="btn btn-ghost"
+    (click)="next()"
+    [disabled]="isLastPage()"
+  >
+    Next ›
+  </button>
+</nav>

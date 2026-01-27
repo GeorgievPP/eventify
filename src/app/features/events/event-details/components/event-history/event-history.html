@@ -1,1 +1,89 @@
-<p>event-history works!</p>
+<section class="container-app pb-10">
+  <section class="card p-5 sm:p-6">
+    <div class="flex items-center justify-between gap-3">
+      <div>
+        <h2 class="text-lg font-bold">Event history</h2>
+        <p class="mt-1 text-sm" style="color: rgb(var(--muted))">
+          Audit log of changes for this event.
+        </p>
+      </div>
+
+      @if (history().length > 0) {
+      <button type="button" class="btn btn-ghost" (click)="toggleSort()">
+        @if (sortOrder() === 'desc') { Newest ↓ } @else { Oldest ↑ }
+      </button>
+      }
+    </div>
+
+    @if (loading()) {
+    <p class="mt-5" style="color: rgb(var(--muted))">Loading history…</p>
+    } @else if (history().length === 0) {
+    <p class="mt-5" style="color: rgb(var(--muted))">No history entries.</p>
+    } @else {
+    <ul class="mt-6 space-y-3">
+      @for (entry of sortedHistory(); track entry._id) {
+      <li class="history-card">
+        <div class="history-row">
+          <div class="min-w-0">
+            <div class="history-action">
+              {{ formatHistoryAction(entry.action) }}
+            </div>
+
+            <div class="history-meta">
+              <span>{{ formatDate(entry.createdAt) }}</span>
+              @if (entry.userId) {
+              <span class="history-dot">•</span>
+              <span>by {{ entry.userId.email }}</span>
+              }
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="btn btn-ghost history-toggle"
+            (click)="toggleDetails(entry._id)"
+          >
+            Details
+            <span class="history-arrow" [class.open]="isExpanded(entry._id)">▼</span>
+          </button>
+        </div>
+
+        @if (isExpanded(entry._id)) {
+        <div class="history-details">
+          @let diffs = compareEventSnapshots(entry); @if (diffs.length === 0) {
+          <p class="text-sm" style="color: rgb(var(--muted))">No field changes.</p>
+          } @else {
+          <ul class="diff-list">
+            @for (d of diffs; track d.field) {
+            <li class="diff-item" [class.is-price]="d.field === 'price'">
+              <div class="diff-label">
+                <strong>{{ d.label }}:</strong>
+              </div>
+
+              <div class="diff-value">
+                @if (d.field === 'price') {
+                <span
+                  class="price-change"
+                  [class.up]="isPriceUp(entry)"
+                  [class.down]="!isPriceUp(entry)"
+                >
+                  {{ d.before }} € → {{ d.after }} €
+                </span>
+                } @else if (d.field === 'isDeleted') {
+                <span>{{ d.before ? 'Yes' : 'No' }} → {{ d.after ? 'Yes' : 'No' }}</span>
+                } @else {
+                <span>{{ d.before || '-' }} → {{ d.after || '-' }}</span>
+                }
+              </div>
+            </li>
+            }
+          </ul>
+          }
+        </div>
+        }
+      </li>
+      }
+    </ul>
+    }
+  </section>
+</section>

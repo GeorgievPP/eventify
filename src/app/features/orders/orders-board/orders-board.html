@@ -1,1 +1,159 @@
-<p>orders-board works!</p>
+<section class="container-app py-10">
+  <!-- Header -->
+  <header class="mb-6 sm:mb-8">
+    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wide" style="color: rgb(var(--muted))">
+          @if (isStaff()) { All Orders } @else { My Tickets }
+        </p>
+        <h1 class="mt-1 text-3xl sm:text-4xl font-extrabold tracking-tight">
+          @if (isStaff()) { Orders } @else { My Tickets }
+        </h1>
+        <p class="mt-2 text-sm sm:text-base" style="color: rgb(var(--muted))">
+          @if (isStaff()) {
+            Manage all customer orders and bookings.
+          } @else {
+            View and manage your event tickets.
+          }
+        </p>
+      </div>
+
+      @if (isStaff()) {
+      <nav class="flex flex-wrap gap-2">
+        <a routerLink="/admin/dashboard" class="btn btn-ghost">Dashboard</a>
+        <a routerLink="/admin/events" class="btn btn-ghost">Events</a>
+        <a routerLink="/admin/users" class="btn btn-ghost">Users</a>
+      </nav>
+      }
+    </div>
+  </header>
+
+  <!-- Stats Overview -->
+  <section class="grid gap-4 sm:gap-5 lg:grid-cols-4 mb-6">
+    <article class="card p-4 sm:p-5">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide" style="color: rgb(var(--muted))">
+            Total Orders
+          </p>
+          <p class="mt-2 text-2xl sm:text-3xl font-extrabold">{{ orderStats().total }}</p>
+        </div>
+        <span class="badge">🧾</span>
+      </div>
+    </article>
+
+    <article class="card p-4 sm:p-5">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide" style="color: rgb(var(--muted))">
+            Pending
+          </p>
+          <p class="mt-2 text-2xl sm:text-3xl font-extrabold text-orange-500">
+            {{ orderStats().byStatus.pending }}
+          </p>
+        </div>
+        <span class="badge">⏳</span>
+      </div>
+    </article>
+
+    <article class="card p-4 sm:p-5">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide" style="color: rgb(var(--muted))">
+            Completed
+          </p>
+          <p class="mt-2 text-2xl sm:text-3xl font-extrabold text-green-500">
+            {{ orderStats().byStatus.completed }}
+          </p>
+        </div>
+        <span class="badge">✓</span>
+      </div>
+    </article>
+
+    <article class="card p-4 sm:p-5">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide" style="color: rgb(var(--muted))">
+            Revenue
+          </p>
+          <p class="mt-2 text-2xl sm:text-3xl font-extrabold">
+            {{ orderStats().revenue | number : '1.0-0' }} €
+          </p>
+          <p class="text-xs mt-1" style="color: rgb(var(--muted))">
+            Avg: {{ orderStats().avgOrderValue | number : '1.2-2' }} €
+          </p>
+        </div>
+        <span class="badge">💰</span>
+      </div>
+    </article>
+  </section>
+
+  <!-- Filters -->
+  <app-orders-filters
+    [isStaff]="isStaff()"
+    [isAdmin]="isAdmin()"
+    [email]="emailFilter()"
+    [status]="statusFilter()"
+    [dateRange]="dateRangeFilter()"
+    [statusOptions]="statusOptions"
+    [dateRangeOptions]="dateRangeOptions"
+    [effectiveCount]="effectiveCount()"
+    [resultsCount]="resultsCount()"
+    (emailChange)="emailFilter.set($event)"
+    (statusChange)="statusFilter.set($event)"
+    (dateRangeChange)="dateRangeFilter.set($event)"
+    (exportAll)="exportOrders()"
+    (export30)="exportOrdersLast30Days()"
+    (export7)="exportOrdersLast7Days()"
+    (clearHistory)="openClearHistory()"
+  />
+
+  <!-- Empty State (no orders at all) -->
+  @if (effectiveCount() === 0) {
+  <section class="card p-12 text-center">
+    <div class="text-6xl mb-4">📦</div>
+    <h3 class="text-xl font-bold">No orders yet</h3>
+    <p class="mt-2 text-sm max-w-md mx-auto" style="color: rgb(var(--muted))">
+      @if (isStaff()) {
+        Customer orders will appear here once they start booking events.
+      } @else {
+        You haven't placed any orders yet. Browse events and book your tickets!
+      }
+    </p>
+    @if (!isStaff()) {
+    <a routerLink="/events" class="btn btn-primary mt-6">Browse Events</a>
+    }
+  </section>
+  }
+  @else if (resultsCount() === 0) {
+  <!-- Empty State (filtered, but no results) -->
+  <section class="card p-12 text-center">
+    <div class="text-6xl mb-4">🔍</div>
+    <h3 class="text-xl font-bold">No results found</h3>
+    <p class="mt-2 text-sm max-w-md mx-auto" style="color: rgb(var(--muted))">
+      No orders match your current filters. Try adjusting your search criteria.
+    </p>
+  </section>
+  }
+  @else {
+  <!-- Orders Table -->
+  <app-orders-table
+    [columns]="orderColumns"
+    [rows]="tableRows()"
+    [rowLink]="orderRowLink"
+    [rowClickable]="false"
+  />
+  }
+
+  <!-- Clear History Confirmation Dialog -->
+  <app-ack-confirm-dialog
+    [open]="clearHistoryOpen()"
+    title="Clear order history"
+    message="This will permanently delete all your order records. This action cannot be undone."
+    confirmText="Clear history"
+    cancelText="Cancel"
+    variant="danger"
+    (cancel)="closeClearHistory()"
+    (confirm)="confirmClearHistory()"
+  />
+</section>

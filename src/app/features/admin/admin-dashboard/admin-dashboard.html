@@ -1,1 +1,253 @@
-<p>admin-dashboard works!</p>
+<section class="container-app py-10">
+  <!-- Header / Hero -->
+  <header class="mb-6 sm:mb-8">
+    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wide" style="color: rgb(var(--muted))">
+          Admin
+        </p>
+        <h1 class="mt-1 text-3xl sm:text-4xl font-extrabold tracking-tight">Dashboard</h1>
+        <p class="mt-2 text-sm sm:text-base" style="color: rgb(var(--muted))">
+          Overview of users, orders, events, and revenue.
+        </p>
+      </div>
+
+      <!-- Quick actions -->
+      <nav class="flex flex-wrap gap-2">
+        <a routerLink="/admin/users" class="btn btn-ghost">Manage users</a>
+        <a routerLink="/orders" class="btn btn-ghost">View orders</a>
+        <a routerLink="/admin/events" class="btn btn-ghost">Manage events</a>
+        <a routerLink="/create-event" class="btn btn-primary">Add event</a>
+      </nav>
+    </div>
+  </header>
+
+  @if (!isStaff()) {
+  <section class="card p-6">
+    <h3 class="text-lg font-bold">Access denied</h3>
+    <p class="mt-2 text-sm" style="color: rgb(var(--muted))">
+      You do not have permissions to view this page.
+    </p>
+  </section>
+  } @else {
+
+  <!-- Period filter -->
+  <app-dashboard-period
+    [period]="period()"
+    [label]="periodLabel()"
+    (periodChange)="setPeriod($event)"
+  />
+
+  <!-- KPI grid (Users, Orders, Events, Tickets) -->
+  <section class="grid gap-4 sm:gap-5 lg:grid-cols-12 mb-6">
+    <!-- Users Card -->
+    <article class="card p-5 sm:p-6 lg:col-span-3">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="text-sm font-semibold">Users</p>
+          <p class="mt-1 text-xs" style="color: rgb(var(--muted))">Active accounts</p>
+        </div>
+        <span class="badge">👥</span>
+      </div>
+
+      @if (usersLoading()) {
+      <p class="mt-6 text-sm" style="color: rgb(var(--muted))">Loading…</p>
+      } @else {
+      <p class="mt-6 text-3xl font-extrabold">{{ totalUsers() }}</p>
+
+      <div class="mt-4 grid grid-cols-2 gap-3">
+        <div class="dash-mini">
+          <p class="text-xs" style="color: rgb(var(--muted))">Active</p>
+          <p class="mt-1 font-bold">{{ activeUsers() }}</p>
+        </div>
+        <div class="dash-mini">
+          <p class="text-xs" style="color: rgb(var(--muted))">Deleted</p>
+          <p class="mt-1 font-bold">{{ deletedUsers() }}</p>
+        </div>
+      </div>
+      }
+    </article>
+
+    <!-- Events Card -->
+    <article class="card p-5 sm:p-6 lg:col-span-3">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="text-sm font-semibold">Events</p>
+          <p class="mt-1 text-xs" style="color: rgb(var(--muted))">Active & upcoming</p>
+        </div>
+        <span class="badge">🎫</span>
+      </div>
+
+      @if (eventsLoading()) {
+      <p class="mt-6 text-sm" style="color: rgb(var(--muted))">Loading…</p>
+      } @else {
+      <p class="mt-6 text-3xl font-extrabold">{{ totalEvents() }}</p>
+
+      <div class="mt-4 grid grid-cols-2 gap-3">
+        <div class="dash-mini">
+          <p class="text-xs" style="color: rgb(var(--muted))">Active</p>
+          <p class="mt-1 font-bold">{{ activeEvents() }}</p>
+        </div>
+        <div class="dash-mini">
+          <p class="text-xs" style="color: rgb(var(--muted))">Upcoming</p>
+          <p class="mt-1 font-bold text-blue-500">{{ upcomingEvents() }}</p>
+        </div>
+        <div class="dash-mini">
+          <p class="text-xs" style="color: rgb(var(--muted))">Sold Out</p>
+          <p class="mt-1 font-bold text-red-600">{{ soldOutEvents() }}</p>
+        </div>
+        <div class="dash-mini">
+          <p class="text-xs" style="color: rgb(var(--muted))">Avg Price</p>
+          <p class="mt-1 font-bold">{{ avgTicketPrice() | number : '1.0-0' }} €</p>
+        </div>
+      </div>
+      }
+    </article>
+
+    <!-- Orders Card -->
+    <article class="card p-5 sm:p-6 lg:col-span-3">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="text-sm font-semibold">Orders</p>
+          <p class="mt-1 text-xs" style="color: rgb(var(--muted))">{{ periodLabel() }}</p>
+        </div>
+        <span class="badge">🧾</span>
+      </div>
+
+      <p class="mt-6 text-3xl font-extrabold">{{ totalOrders() }}</p>
+
+      <div class="mt-4 grid grid-cols-2 gap-3">
+        <div class="dash-mini">
+          <p class="text-xs" style="color: rgb(var(--muted))">Revenue</p>
+          <p class="mt-1 font-bold">{{ totalRevenue() | number : '1.0-0' }} €</p>
+        </div>
+        <div class="dash-mini">
+          <p class="text-xs" style="color: rgb(var(--muted))">Avg order</p>
+          <p class="mt-1 font-bold">{{ averageOrderValue() | number : '1.2-2' }} €</p>
+        </div>
+        <div class="dash-mini col-span-2">
+          <p class="text-xs" style="color: rgb(var(--muted))">Conversion Rate</p>
+          <p class="mt-1 font-bold text-green-500">{{ conversionRate() | number : '1.1-1' }}%</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- Tickets Card -->
+    <article class="card p-5 sm:p-6 lg:col-span-3">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="text-sm font-semibold">Tickets</p>
+          <p class="mt-1 text-xs" style="color: rgb(var(--muted))">Sold vs Available</p>
+        </div>
+        <span class="badge">🎟️</span>
+      </div>
+
+      <p class="mt-6 text-3xl font-extrabold">{{ ticketsSoldPercentage() | number : '1.0-0' }}%</p>
+
+      <div class="mt-4 grid grid-cols-2 gap-3">
+        <div class="dash-mini">
+          <p class="text-xs" style="color: rgb(var(--muted))">Available</p>
+          <p class="mt-1 font-bold">{{ totalTicketsAvailable().toLocaleString() }}</p>
+        </div>
+        <div class="dash-mini">
+          <p class="text-xs" style="color: rgb(var(--muted))">Capacity</p>
+          <p class="mt-1 font-bold">{{ totalTicketsCapacity().toLocaleString() }}</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- Orders by Status -->
+    <article class="card p-5 sm:p-6 lg:col-span-6">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="text-sm font-semibold">Orders by status</p>
+          <p class="mt-1 text-xs" style="color: rgb(var(--muted))">Click to filter</p>
+        </div>
+        <span class="badge">📦</span>
+      </div>
+
+      @if (statusStats().length === 0) {
+      <p class="mt-6 text-sm" style="color: rgb(var(--muted))">No orders in this period.</p>
+      } @else {
+      <div class="mt-5 flex flex-wrap gap-2">
+        @for (s of statusStats(); track s.status) {
+        <a
+          class="dash-chip"
+          [routerLink]="['/orders']"
+          [queryParams]="{ status: s.status }"
+          title="Filter orders"
+        >
+          <span class="dash-chip__label">{{ s.status }}</span>
+          <span class="dash-chip__value">{{ s.count }}</span>
+        </a>
+        }
+      </div>
+      }
+    </article>
+
+    <!-- Low Stock Alerts -->
+    @if (lowStockEvents().length > 0) {
+    <article class="card p-5 sm:p-6 lg:col-span-6">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="text-sm font-semibold">⚠️ Low Stock Alerts</p>
+          <p class="mt-1 text-xs" style="color: rgb(var(--muted))">Events running low on tickets</p>
+        </div>
+        <span class="badge">🔔</span>
+      </div>
+
+      <div class="mt-5 space-y-2">
+        @for (event of lowStockEvents(); track event._id) {
+        <a
+          [routerLink]="['/details-event', event._id]"
+          class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-800/30 transition-colors"
+        >
+          <div class="min-w-0 flex-1">
+            <p class="text-sm font-medium truncate">{{ event.title }}</p>
+            <p class="text-xs mt-0.5" style="color: rgb(var(--muted))">
+              Only {{ event.availableTickets }} left ({{ ((event.availableTickets / event.totalTickets) * 100) | number : '1.0-0' }}%)
+            </p>
+          </div>
+          <span class="text-xs text-orange-600 font-bold ml-2">LOW</span>
+        </a>
+        }
+      </div>
+    </article>
+    }
+
+    <!-- Admin Access Note -->
+    @if (isAdmin()) {
+    <article class="card p-5 sm:p-6 lg:col-span-12">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <p class="text-sm font-semibold">Admin access</p>
+          <p class="mt-1 text-sm" style="color: rgb(var(--muted))">
+            You can change roles, delete and restore users, and clear history.
+          </p>
+        </div>
+        <span class="badge">🔐</span>
+      </div>
+    </article>
+    }
+  </section>
+
+  <!-- Recent orders + Top events -->
+  <section class="grid gap-4 sm:gap-5 lg:grid-cols-12">
+    <app-dashboard-recent-orders
+      class="lg:col-span-7"
+      [orders]="recentOrders()"
+      [periodLabel]="periodLabel()"
+      [formatDate]="formatDate.bind(this)"
+      [formatCurrency]="formatCurrency.bind(this)"
+    />
+
+    <app-dashboard-top-events
+      class="lg:col-span-5"
+      [events]="topEvents()"
+      [periodLabel]="periodLabel()"
+      [formatCurrency]="formatCurrency.bind(this)"
+    />
+  </section>
+
+  }
+</section>

@@ -1,1 +1,56 @@
-<p>data-table works!</p>
+<table class="data-table">
+  <thead>
+    <tr>
+      @for (col of columns(); track col.key) {
+      <th
+        (click)="onHeaderClick(col)"
+        [class.align-right]="col.align === 'right'"
+        [class.align-center]="col.align === 'center'"
+        [class.sortable]="col.sortable !== false"
+        [class.sorted]="sortKey() === col.key"
+      >
+        <span class="header-label">
+          {{ col.label }}
+        </span>
+
+        @if (sortKey() === col.key) {
+        <span class="sort-indicator">
+          {{ sortDir() === 'asc' ? '▲' : '▼' }}
+        </span>
+        }
+      </th>
+      }
+    </tr>
+  </thead>
+
+  <tbody>
+    @if (!rows() || rows().length === 0) {
+    <tr class="empty-row">
+      <td [attr.colspan]="columns().length || 1">
+        {{ emptyMessage() }}
+      </td>
+    </tr>
+    } @else { 
+      @for (row of sortedRows(); track trackByRow($index, row)) {
+      <tr (click)="onRowClick(row)" [class.row-clickable]="rowClickable() && rowLink()">
+        @for (col of columns(); track col.key) {
+        <td [class.align-right]="col.align === 'right'" [class.align-center]="col.align === 'center'">
+          @if (col.isActions && actionsTemplate()) {
+          <!-- Actions column -->
+          <div (click)="$event.stopPropagation()">
+            <ng-container
+              [ngTemplateOutlet]="actionsTemplate()!"
+              [ngTemplateOutletContext]="{ $implicit: row }"
+            ></ng-container>
+          </div>
+          } @else {
+          <!-- Regular cell -->
+          {{ getCellValue(col, row) }}
+          }
+        </td>
+        }
+      </tr>
+      } 
+    }
+  </tbody>
+</table>

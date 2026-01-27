@@ -1,1 +1,212 @@
-<p>admin-events-table works!</p>
+<section class="card p-0 overflow-hidden">
+  <div class="admin-table-wrap">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th class="sortable" (click)="onSort('title')">
+            <div class="flex items-center gap-2">
+              Title
+              @if (sortBy() === 'title') {
+                <span class="sort-arrow">{{ sortDirection() === 'asc' ? '↑' : '↓' }}</span>
+              }
+            </div>
+          </th>
+          <th class="sortable" (click)="onSort('date')">
+            <div class="flex items-center gap-2">
+              Date
+              @if (sortBy() === 'date') {
+                <span class="sort-arrow">{{ sortDirection() === 'asc' ? '↑' : '↓' }}</span>
+              }
+            </div>
+          </th>
+          <th>Venue</th>
+          <th>Genre</th>
+          <th class="price sortable" (click)="onSort('price')">
+            <div class="flex items-center gap-2">
+              Price
+              @if (sortBy() === 'price') {
+                <span class="sort-arrow">{{ sortDirection() === 'asc' ? '↑' : '↓' }}</span>
+              }
+            </div>
+          </th>
+          <th class="sortable" (click)="onSort('tickets')">
+            <div class="flex items-center gap-2">
+              Tickets
+              @if (sortBy() === 'tickets') {
+                <span class="sort-arrow">{{ sortDirection() === 'asc' ? '↑' : '↓' }}</span>
+              }
+            </div>
+          </th>
+          <th class="price sortable" (click)="onSort('revenue')">
+            <div class="flex items-center gap-2">
+              Revenue
+              @if (sortBy() === 'revenue') {
+                <span class="sort-arrow">{{ sortDirection() === 'asc' ? '↑' : '↓' }}</span>
+              }
+            </div>
+          </th>
+          <th>Status</th>
+          <th>Owner</th>
+          <th>Created</th>
+          <th class="center">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (event of events(); track event._id) {
+          <tr [class.is-deleted]="event.isDeleted">
+            <!-- Title -->
+            <td class="min-w-[220px]">
+              <a [routerLink]="['/details-event', event._id]" class="nav-link font-semibold">
+                {{ event.title }}
+              </a>
+            </td>
+
+            <!-- Event Date -->
+            <td class="min-w-[120px]">
+              <span class="text-sm">{{ formatEventDate()(event.eventDate) }}</span>
+              @if (event.eventTime) {
+                <span class="block text-xs mt-0.5" style="color: rgb(var(--muted))">
+                  {{ event.eventTime }}
+                </span>
+              }
+            </td>
+
+            <!-- Venue & Location -->
+            <td class="min-w-[200px]">
+              @if (event.venue) {
+                <span class="text-sm font-medium">{{ event.venue }}</span>
+                @if (event.location) {
+                  <span class="block text-xs mt-0.5" style="color: rgb(var(--muted))">
+                    {{ event.location }}
+                  </span>
+                }
+              } @else {
+                <span style="color: rgb(var(--muted))">-</span>
+              }
+            </td>
+
+            <!-- Genre -->
+            <td class="min-w-[120px]">
+              <span
+                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                style="background: rgba(var(--accent), 0.15)"
+              >
+                {{ event.genre }}
+              </span>
+            </td>
+
+            <!-- Price -->
+            <td class="price">{{ formatPrice()(event.price) }} €</td>
+
+            <!-- Tickets (Available / Total + Percentage) -->
+            <td class="min-w-[160px]">
+              <div class="flex flex-col gap-1">
+                <div class="flex items-center gap-2">
+                  @if (event.availableTickets === 0) {
+                    <span class="text-xs font-bold text-red-600">SOLD OUT</span>
+                  } @else {
+                    <span class="text-sm font-semibold">
+                      {{ event.availableTickets.toLocaleString() }}
+                    </span>
+                    <span class="text-xs" style="color: rgb(var(--muted))">
+                      / {{ event.totalTickets.toLocaleString() }}
+                    </span>
+                  }
+                </div>
+
+                <!-- Progress bar -->
+                <div
+                  class="w-full h-1.5 rounded-full overflow-hidden"
+                  style="background: rgba(var(--border), 0.3)"
+                >
+                  <div
+                    class="h-full transition-all"
+                    [style.width.%]="getTicketPercentage(event)"
+                    [class.bg-green-500]="getTicketPercentage(event) > 50"
+                    [class.bg-orange-500]="
+                      getTicketPercentage(event) <= 50 && getTicketPercentage(event) > 20
+                    "
+                    [class.bg-red-600]="getTicketPercentage(event) <= 20"
+                  ></div>
+                </div>
+
+                <span class="text-xs" style="color: rgb(var(--muted))">
+                  {{ getTicketPercentage(event) | number: '1.0-0' }}% available
+                </span>
+              </div>
+            </td>
+
+            <!-- Revenue (from orders) -->
+            <td class="price min-w-[140px]">
+              <div class="flex flex-col">
+                <span class="font-bold">{{ formatPrice()(getEventRevenue()(event._id)) }} €</span>
+                <span class="text-xs mt-0.5" style="color: rgb(var(--muted))">
+                  {{ getTicketsSold()(event._id) }} sold
+                </span>
+              </div>
+            </td>
+
+            <!-- Status -->
+            <td class="min-w-[100px]">
+              <span
+                class="admin-status"
+                [class.is-active]="!event.isDeleted"
+                [class.is-deleted]="event.isDeleted"
+              >
+                {{ statusLabel()(event) }}
+              </span>
+            </td>
+
+            <!-- Owner -->
+            <td class="min-w-[200px]">
+              <span class="mono text-xs">{{ event.owner?.email || '-' }}</span>
+            </td>
+
+            <!-- Created -->
+            <td class="min-w-[130px]">
+              <span class="text-xs">{{ formatDateIso()(event.createdAtIso || null) }}</span>
+            </td>
+
+            <!-- Actions -->
+            <td class="center min-w-[280px]">
+              <div class="flex items-center justify-center gap-2 flex-wrap">
+                <a [routerLink]="['/details-event', event._id]" class="btn btn-ghost btn-sm">
+                  Details
+                </a>
+
+                <a [routerLink]="['/edit-event', event._id]" class="btn btn-ghost btn-sm"> Edit </a>
+
+                @if (!event.isDeleted) {
+                  <button type="button" class="btn btn-ghost btn-sm" (click)="onSoftDelete(event)">
+                    Delete
+                  </button>
+                } @else {
+                  <button type="button" class="btn btn-ghost btn-sm" (click)="onRestore(event)">
+                    Restore
+                  </button>
+
+                  <button
+                    type="button"
+                    class="btn btn-ghost btn-sm btn-danger-soft"
+                    (click)="onHardDelete(event)"
+                  >
+                    Purge
+                  </button>
+                }
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div
+    class="px-5 py-3 text-xs border-t flex items-center justify-between"
+    style="border-color: rgb(var(--border)); color: rgb(var(--muted))"
+  >
+    <span>Showing {{ events().length }} events</span>
+    <span>On mobile: swipe horizontally to see more columns</span>
+  </div>
+</section>

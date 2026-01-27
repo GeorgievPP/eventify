@@ -1,1 +1,31 @@
-<p>confirm-dialog works!</p>
+@if (open()) {
+<div class="modal-backdrop" (click)="cancel.emit()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">{{ title() }}</h3>
+      <button type="button" class="btn btn-ghost modal-x" (click)="cancel.emit()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <p style="color: rgb(var(--muted))">{{ message() }}</p>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-ghost" (click)="cancel.emit()">
+        {{ cancelText() }}
+      </button>
+
+      <button
+        type="button"
+        class="btn"
+        [class.btn-danger]="variant() === 'danger'"
+        [class.btn-primary]="variant() !== 'danger'"
+        [disabled]="confirmDisabled()"
+        (click)="confirm.emit()"
+      >
+        {{ confirmText() }}
+      </button>
+    </div>
+  </div>
+</div>
+}

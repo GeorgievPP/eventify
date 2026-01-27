@@ -1,1 +1,86 @@
-<p>dashboard-kpis works!</p>
+<section class="grid gap-4 sm:gap-5 lg:grid-cols-12">
+  <!-- Users -->
+  <article class="card p-5 sm:p-6 lg:col-span-4">
+    <div class="flex items-start justify-between gap-3">
+      <div>
+        <p class="text-sm font-semibold">Users</p>
+        <p class="mt-1 text-xs" style="color: rgb(var(--muted))">Active and deleted accounts</p>
+      </div>
+      <span class="badge">👥</span>
+    </div>
+
+    @if (usersLoading) {
+    <p class="mt-6 text-sm" style="color: rgb(var(--muted))">Loading…</p>
+    } @else {
+    <p class="mt-6 text-3xl font-extrabold">{{ totalUsers }}</p>
+
+    <div class="mt-4 grid grid-cols-2 gap-3">
+      <div class="dash-mini">
+        <p class="text-xs" style="color: rgb(var(--muted))">Active</p>
+        <p class="mt-1 font-bold">{{ activeUsers }}</p>
+      </div>
+      <div class="dash-mini">
+        <p class="text-xs" style="color: rgb(var(--muted))">Deleted</p>
+        <p class="mt-1 font-bold">{{ deletedUsers }}</p>
+      </div>
+    </div>
+    }
+  </article>
+
+  <!-- Orders / Revenue -->
+  <article class="card p-5 sm:p-6 lg:col-span-4">
+    <div class="flex items-start justify-between gap-3">
+      <div>
+        <p class="text-sm font-semibold">Orders</p>
+        <p class="mt-1 text-xs" style="color: rgb(var(--muted))">Revenue in {{ periodLabel }}</p>
+      </div>
+      <span class="badge">🧾</span>
+    </div>
+
+    <p class="mt-6 text-3xl font-extrabold">{{ totalOrders }}</p>
+
+    <div class="mt-4 grid grid-cols-2 gap-3">
+      <div class="dash-mini">
+        <p class="text-xs" style="color: rgb(var(--muted))">Revenue</p>
+        <p class="mt-1 font-bold">{{ totalRevenue | number : '1.2-2' }} €</p>
+      </div>
+      <div class="dash-mini">
+        <p class="text-xs" style="color: rgb(var(--muted))">Avg order</p>
+        <p class="mt-1 font-bold">{{ averageOrderValue | number : '1.2-2' }} €</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- Status overview -->
+  <article class="card p-5 sm:p-6 lg:col-span-4">
+    <div class="flex items-start justify-between gap-3">
+      <div>
+        <p class="text-sm font-semibold">Orders by status</p>
+        <p class="mt-1 text-xs" style="color: rgb(var(--muted))">Click a status to filter orders</p>
+      </div>
+      <span class="badge">📦</span>
+    </div>
+
+    @if (statusStats.length === 0) {
+    <p class="mt-6 text-sm" style="color: rgb(var(--muted))">No orders in this period.</p>
+    } @else {
+    <div class="mt-5 flex flex-wrap gap-2">
+      @for (s of statusStats; track s.status) {
+      <a
+        class="dash-chip"
+        [routerLink]="['/orders']"
+        [queryParams]="{ status: s.status }"
+        title="Filter orders"
+      >
+        <span class="dash-chip__label">{{ statusLabel(s.status) }}</span>
+        <span class="dash-chip__value">{{ s.count }}</span>
+      </a>
+
+  
+      }
+    </div>
+    }
+  </article>
+
+  <ng-content />
+</section>

@@ -1,1 +1,49 @@
-<p>event-board works!</p>
+<section class="container-app py-8 md:py-12">
+  <!-- Header row -->
+  <div class="flex items-end justify-between gap-4">
+    <div class="mb-5 sm:mb-6">
+      <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Upcoming Events</h2>
+      <p class="mt-2 text-sm sm:text-base" style="color: rgb(var(--muted))">
+        Hand-picked events, price drops, and community ratings.
+      </p>
+    </div>
+  </div>
+
+  <!-- Content -->
+  @if (loading()) {
+    <app-event-skeleton-grid [count]="6" />
+  } @else {
+    @if (pagedEvents().length > 0) {
+      <!-- Grid -->
+      <div class="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        @for (item of pagedEvents(); track item._id) {
+          <app-event-item
+            [event]="item"
+            [inCart]="isInCart(item._id)"
+            (toggleCart)="toggleCart($event)"
+          />
+        }
+      </div>
+
+      <!-- Pagination -->
+      @if (totalPages() > 1) {
+        <app-pagination
+          [current]="currentPage()"
+          [total]="totalPages()"
+          (pageChange)="goToPage($event)"
+        />
+      }
+    } @else {
+      <div class="mt-10 card p-8 text-center">
+        <h3 class="text-lg font-bold">No events yet</h3>
+        <p class="mt-2 text-sm" style="color: rgb(var(--muted))">
+          Add your first event or try the search page.
+        </p>
+        <div class="mt-5 flex justify-center gap-3">
+          <a routerLink="/create-event" class="btn btn-primary">Add event</a>
+          <a routerLink="/search-events" class="btn btn-ghost">Search</a>
+        </div>
+      </div>
+    }
+  }
+</section>

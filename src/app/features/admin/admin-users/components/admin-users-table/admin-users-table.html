@@ -1,1 +1,136 @@
-<p>admin-users-table works!</p>
+<section class="card p-0 overflow-hidden">
+  <div class="admin-table-wrap">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Joined</th>
+          <th class="center">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (user of users(); track user._id) {
+        <tr [class.is-deleted]="user.isDeleted">
+          <!-- User Info with Avatar -->
+          <td class="min-w-[240px]">
+            <div class="flex items-center gap-3">
+              <!-- Avatar -->
+              <div 
+                class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold"
+                style="background: rgba(var(--accent), 0.15); color: rgb(var(--accent))"
+              >
+                {{ getUserInitials(user.email) }}
+              </div>
+              
+              <!-- Email -->
+              <div class="min-w-0">
+                <p class="font-semibold truncate">{{ user.email }}</p>
+                @if (user.createdAt) {
+                <p class="text-xs mt-0.5" style="color: rgb(var(--muted))">
+                  ID: {{ user._id}}
+                </p>
+                }
+              </div>
+            </div>
+          </td>
+
+          <!-- Role (Select or Badge) -->
+          <td class="min-w-[180px]">
+            @if (isAdmin() && !user.isDeleted) {
+            <div class="flex items-center gap-2">
+              <select
+                class="input py-1.5"
+                [ngModel]="user.role"
+                (ngModelChange)="onRoleChange(user._id, $event)"
+                [disabled]="isSaving()(user._id)"
+              >
+                @for (role of roles(); track role) {
+                <option [ngValue]="role">{{ role }}</option>
+                }
+              </select>
+
+              @if (isSaving()(user._id)) {
+              <span class="text-xs animate-pulse" style="color: rgb(var(--muted))">
+                Saving…
+              </span>
+              }
+            </div>
+            } @else {
+            <span 
+              class="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold border"
+              [class]="getRoleBadgeClass(user.role)"
+            >
+              {{ formatRole(user.role) }}
+            </span>
+            }
+          </td>
+
+          <!-- Status Badge -->
+          <td class="min-w-[120px]">
+            <span
+              class="admin-status"
+              [class.is-active]="!user.isDeleted"
+              [class.is-deleted]="user.isDeleted"
+            >
+              @if (isChangingStatus()(user._id)) {
+                Working…
+              } @else {
+                {{ statusLabel()(user) }}
+              }
+            </span>
+          </td>
+
+          <!-- Joined Date -->
+          <td class="min-w-[140px]">
+            @if (user.createdAt) {
+            <span class="text-sm">{{ formatDate(user.createdAt) }}</span>
+            } @else {
+            <span style="color: rgb(var(--muted))">-</span>
+            }
+          </td>
+
+          <!-- Actions -->
+          <td class="center min-w-[200px]">
+            <div class="flex items-center justify-center gap-2">
+              @if (isAdmin()) {
+                @if (!user.isDeleted) {
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-sm"
+                  (click)="delete(user)"
+                  [disabled]="isChangingStatus()(user._id)"
+                >
+                  Delete
+                </button>
+                } @else {
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-sm"
+                  (click)="restore(user)"
+                  [disabled]="isChangingStatus()(user._id)"
+                >
+                  Restore
+                </button>
+                }
+              } @else {
+                <span class="text-xs" style="color: rgb(var(--muted))">Admin only</span>
+              }
+            </div>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div
+    class="px-5 py-3 text-xs border-t flex items-center justify-between"
+    style="border-color: rgb(var(--border)); color: rgb(var(--muted))"
+  >
+    <span>Showing {{ users().length }} users</span>
+    <span>On mobile: swipe horizontally to see more columns</span>
+  </div>
+</section>

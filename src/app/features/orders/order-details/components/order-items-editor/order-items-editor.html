@@ -1,1 +1,220 @@
-<p>order-items-editor works!</p>
+<section class="card p-5 sm:p-6 mt-6">
+  <div class="flex items-center justify-between gap-3">
+    <h2 class="text-lg font-bold">Order Items</h2>
+    <div class="flex items-center gap-2">
+      <span class="badge">{{ items().length }}</span>
+      @if (items().length > 0) {
+      <span class="text-sm" style="color: rgb(var(--muted))">
+        ({{ totalTickets() }} tickets)
+      </span>
+      }
+    </div>
+  </div>
+
+  @if (items().length === 0) {
+  <!-- Empty State -->
+  <div class="mt-8 mb-4 text-center py-8">
+    <div class="text-5xl mb-3">🎫</div>
+    <p class="font-semibold">No items in this order</p>
+    <p class="text-sm mt-1" style="color: rgb(var(--muted))">
+      @if (canEdit()) {
+        Add items using the form below.
+      } @else {
+        This order has no items.
+      }
+    </p>
+  </div>
+  } @else {
+
+  <div class="mt-4" style="border-top: 1px solid rgb(var(--border))"></div>
+
+  <!-- Items Table -->
+  <div class="mt-4 overflow-x-auto -mx-2 px-2">
+    <table class="w-full min-w-[760px]">
+      <thead>
+        <tr class="text-sm" style="color: rgb(var(--muted))">
+          <th class="text-left py-3 font-semibold">Event</th>
+          <th class="text-center py-3 font-semibold">Quantity</th>
+          <th class="text-right py-3 font-semibold">Unit Price</th>
+          <th class="text-right py-3 font-semibold">Line Total</th>
+          @if (canEdit()) {
+          <th class="text-center py-3 font-semibold">Actions</th>
+          }
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (item of items(); track item.eventId; let i = $index) {
+        <tr class="group" style="border-top: 1px solid rgb(var(--border))">
+          <!-- Event Title -->
+          <td class="py-4 pr-3">
+            <div class="flex items-center gap-3">
+              <div class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-xl"
+                   style="background: rgba(var(--accent), 0.12)">
+                🎭
+              </div>
+              <div class="min-w-0">
+                <p class="font-semibold">{{ item.title }}</p>
+                <p class="text-xs mt-0.5" style="color: rgb(var(--muted))">
+                  ID: {{ item.eventId }}
+                </p>
+              </div>
+            </div>
+          </td>
+
+          <!-- Quantity Controls -->
+          <td class="py-4">
+            @if (canEdit()) {
+            <div class="flex items-center justify-center gap-2">
+              <button
+                type="button"
+                class="btn btn-ghost px-2 py-1 min-w-[32px]"
+                (click)="decrease.emit(i)"
+                [disabled]="savingItems || item.quantity <= 1"
+                aria-label="Decrease"
+              >
+                −
+              </button>
+
+              <input
+                class="input w-16 text-center font-semibold"
+                type="number"
+                min="1"
+                [ngModel]="item.quantity"
+                (ngModelChange)="onQuantityInput(i, $event)"
+                [disabled]="savingItems()"
+              />
+
+              <button
+                type="button"
+                class="btn btn-ghost px-2 py-1 min-w-[32px]"
+                (click)="increase.emit(i)"
+                [disabled]="savingItems()"
+                aria-label="Increase"
+              >
+                +
+              </button>
+            </div>
+            } @else {
+            <p class="text-center font-semibold">{{ item.quantity }}</p>
+            }
+          </td>
+
+          <!-- Unit Price -->
+          <td class="py-4 text-right">
+            <span class="font-medium">{{ item.unitPrice | number : '1.2-2' }} €</span>
+          </td>
+
+          <!-- Line Total -->
+          <td class="py-4 text-right">
+            <span class="font-bold text-lg">{{ item.lineTotal | number : '1.2-2' }} €</span>
+          </td>
+
+          <!-- Actions -->
+          @if (canEdit()) {
+          <td class="py-4 text-center">
+            <button
+              type="button"
+              class="btn btn-ghost btn-danger-soft px-3 py-1.5 text-sm opacity-0 group-hover:opacity-100 transition-opacity"
+              (click)="openRemoveModal(i)"
+              [disabled]="savingItems()"
+            >
+              Remove
+            </button>
+          </td>
+          }
+        </tr>
+        }
+
+        <!-- Subtotal Row -->
+        <tr style="border-top: 2px solid rgb(var(--border))">
+          <td colspan="3" class="py-4 text-right font-bold">Subtotal:</td>
+          <td class="py-4 text-right">
+            <span class="text-xl font-extrabold">
+              {{ subtotal() | number : '1.2-2' }} €
+            </span>
+          </td>
+          @if (canEdit()) {
+          <td></td>
+          }
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  }
+
+  <!-- Add Item Form (Staff Only) -->
+  @if (canEdit()) {
+  <div class="mt-6 pt-6" style="border-top: 1px solid rgb(var(--border))">
+    <h3 class="text-sm font-bold mb-4" style="color: rgb(var(--muted))">ADD NEW ITEM</h3>
+    
+    <div class="grid gap-4 sm:grid-cols-3 items-end">
+      <label class="grid gap-2 sm:col-span-2">
+        <span class="text-sm font-medium">Select Event</span>
+        <select
+          class="input"
+          [ngModel]="selectedEventId()"
+          (ngModelChange)="selectedEventId.set($event)"
+          [disabled]="eventsLoading() || savingItems()"
+        >
+          <option [ngValue]="null">-- Choose an event --</option>
+          @for (e of availableEvents(); track e._id) {
+          <option [ngValue]="e._id">
+            {{ e.title }} • {{ e.price ?? 0 | number : '1.2-2' }} € • 
+            {{ e.availableTickets }} / {{ e.totalTickets }} available
+          </option>
+          }
+        </select>
+      </label>
+
+      <label class="grid gap-2">
+        <span class="text-sm font-medium">Quantity</span>
+        <input
+          class="input"
+          type="number"
+          min="1"
+          [ngModel]="newItemQuantity()"
+          (ngModelChange)="newItemQuantity.set($event)"
+          [disabled]="savingItems()"
+        />
+      </label>
+    </div>
+
+    <div class="mt-4 flex flex-col sm:flex-row gap-2 sm:justify-end">
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="onAddItem()"
+        [disabled]="savingItems() || eventsLoading() || !selectedEventId() || newItemQuantity() < 1"
+      >
+        <span class="text-lg mr-1">+</span> Add Item
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-ghost"
+        (click)="saveItems.emit()"
+        [disabled]="savingItems()"
+      >
+        @if (savingItems()) {
+          <span class="inline-block animate-spin mr-2">⚙️</span> Saving…
+        } @else {
+          💾 Save All Changes
+        }
+      </button>
+    </div>
+  </div>
+  }
+
+  <!-- Remove Confirmation Dialog -->
+  <app-confirm-dialog
+    [open]="removeIndex() !== null"
+    title="Remove item"
+    message="Are you sure you want to remove this item from the order?"
+    confirmText="Remove"
+    cancelText="Cancel"
+    variant="danger"
+    (cancel)="closeRemoveModal()"
+    (confirm)="confirmRemove()"
+  />
+</section>

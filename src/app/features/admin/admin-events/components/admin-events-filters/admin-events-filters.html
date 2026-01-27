@@ -1,1 +1,59 @@
-<p>admin-events-filters works!</p>
+<section class="card p-4 sm:p-5 mb-6">
+  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <!-- Status segmented -->
+    <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+      <div>
+        <p class="text-sm font-semibold">Filter</p>
+        <p class="text-xs mt-1" style="color: rgb(var(--muted))">Status & search</p>
+      </div>
+
+      <div
+        class="inline-flex rounded-2xl border p-1"
+        style="border-color: rgb(var(--border)); background: rgba(var(--accent), 0.06)"
+      >
+        <button
+          type="button"
+          class="admin-pill"
+          (click)="setFilter('all')"
+          [class.is-active]="filter() === 'all'"
+        >
+          All
+        </button>
+
+        <button
+          type="button"
+          class="admin-pill"
+          (click)="setFilter('active')"
+          [class.is-active]="filter() === 'active'"
+        >
+          Active
+        </button>
+
+        <button
+          type="button"
+          class="admin-pill"
+          (click)="setFilter('deleted')"
+          [class.is-active]="filter() === 'deleted'"
+        >
+          Deleted
+        </button>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="w-full lg:max-w-md">
+      <label class="block text-sm font-semibold mb-2">Search</label>
+      <input
+        class="input"
+        type="text"
+        placeholder="Search by title, genre or owner email…"
+        [value]="searchTerm()"
+        (input)="onSearch($any($event.target).value)"
+      />
+    </div>
+  </div>
+
+  <div class="mt-4 text-xs" style="color: rgb(var(--muted))">
+    Tip: use filters to quickly find deleted events for restore/hard delete.
+  </div>
+</section>

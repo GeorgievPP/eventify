@@ -1,1 +1,124 @@
-<p>admin-events works!</p>
+<section class="container-app py-10">
+  <!-- Header -->
+  <header class="mb-6 sm:mb-8">
+    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wide" style="color: rgb(var(--muted))">
+          Admin
+        </p>
+        <h1 class="mt-1 text-3xl sm:text-4xl font-extrabold tracking-tight">Events</h1>
+        <p class="mt-2 text-sm sm:text-base" style="color: rgb(var(--muted))">
+          Manage all events, including soft-deleted ones.
+        </p>
+      </div>
+
+      <nav class="flex flex-wrap gap-2">
+        <a routerLink="/admin/dashboard" class="btn btn-ghost">Dashboard</a>
+        <a routerLink="/admin/users" class="btn btn-ghost">Users</a>
+        <button 
+          type="button" 
+          class="btn btn-ghost"
+          (click)="exportToExcel()"
+          [disabled]="loading()"
+        >
+          Export to Excel
+        </button>
+        <a routerLink="/create-event" class="btn btn-primary">Add event</a>
+      </nav>
+    </div>
+  </header>
+
+  @if (!isStaff()) {
+  <section class="card p-6">
+    <h3 class="text-lg font-bold">Access denied</h3>
+    <p class="mt-2 text-sm" style="color: rgb(var(--muted))">
+      You do not have permissions to view this page.
+    </p>
+  </section>
+  } @else {
+
+  <!-- Stats Overview -->
+  <section class="grid gap-4 sm:gap-5 lg:grid-cols-6 mb-6">
+    <article class="card p-4 sm:p-5">
+      <p class="text-xs font-semibold uppercase tracking-wide" style="color: rgb(var(--muted))">
+        Total
+      </p>
+      <p class="mt-2 text-2xl font-extrabold">{{ totalEvents() }}</p>
+    </article>
+
+    <article class="card p-4 sm:p-5">
+      <p class="text-xs font-semibold uppercase tracking-wide" style="color: rgb(var(--muted))">
+        Active
+      </p>
+      <p class="mt-2 text-2xl font-extrabold">{{ activeEvents() }}</p>
+    </article>
+
+    <article class="card p-4 sm:p-5">
+      <p class="text-xs font-semibold uppercase tracking-wide" style="color: rgb(var(--muted))">
+        Sold Out
+      </p>
+      <p class="mt-2 text-2xl font-extrabold text-red-600">{{ soldOutEvents() }}</p>
+    </article>
+
+    <article class="card p-4 sm:p-5">
+      <p class="text-xs font-semibold uppercase tracking-wide" style="color: rgb(var(--muted))">
+        Upcoming
+      </p>
+      <p class="mt-2 text-2xl font-extrabold text-blue-500">{{ upcomingEvents() }}</p>
+    </article>
+
+    <article class="card p-4 sm:p-5">
+      <p class="text-xs font-semibold uppercase tracking-wide" style="color: rgb(var(--muted))">
+        Deleted
+      </p>
+      <p class="mt-2 text-2xl font-extrabold" style="color: rgb(var(--muted))">
+        {{ deletedEvents() }}
+      </p>
+    </article>
+
+    <article class="card p-4 sm:p-5 bg-gradient-to-br from-purple-500/10 to-blue-500/10">
+      <p class="text-xs font-semibold uppercase tracking-wide" style="color: rgb(var(--muted))">
+        Filtered
+      </p>
+      <p class="mt-2 text-2xl font-extrabold">{{ filteredEvents().length }}</p>
+    </article>
+  </section>
+
+  <!-- Filters -->
+  <app-admin-events-filters
+    [filter]="filter()"
+    [searchTerm]="searchTerm()"
+    (filterChange)="setFilter($event)"
+    (searchChange)="onSearchChange($event)"
+  />
+
+  <!-- Content -->
+  @if (loading()) {
+  <section class="card p-6">
+    <p style="color: rgb(var(--muted))">Loading events…</p>
+  </section>
+  } @else if (filteredEvents().length === 0) {
+  <section class="card p-6">
+    <p class="text-sm" style="color: rgb(var(--muted))">No events match the current filters.</p>
+  </section>
+  } @else {
+
+  <!-- Table (UI only) -->
+  <app-admin-events-table
+    [events]="filteredEvents()"
+    [sortBy]="sortBy()"
+    [sortDirection]="sortDirection()"
+    [formatPrice]="formatPrice.bind(this)"
+    [formatDateIso]="formatDateIso.bind(this)"
+    [formatEventDate]="formatEventDate.bind(this)"
+    [statusLabel]="eventStatusLabel.bind(this)"
+    [getEventRevenue]="getEventRevenue.bind(this)"
+    [getTicketsSold]="getTicketsSold.bind(this)"
+    (sortChange)="setSortBy($event)"
+    (softDelete)="softDelete($event)"
+    (restore)="restore($event)"
+    (hardDelete)="hardDelete($event)"
+  />
+
+  } }
+</section>

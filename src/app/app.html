@@ -1,5 +1,11 @@
-<div class="bg-blue-500 text-white p-4 rounded-xl">
-  Tailwind работи!
+<app-loader></app-loader>
+<app-notifications></app-notifications>
+
+<div id="wrapper">
+  <app-header></app-header>
+  <main>
+    <router-outlet />
+  </main>
 </div>
 
-<router-outlet />
+<app-footer></app-footer>

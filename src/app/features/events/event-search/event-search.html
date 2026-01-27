@@ -1,1 +1,52 @@
-<p>event-search works!</p>
+<section class="container-app py-10">
+  <!-- Header -->
+  <header class="mb-6 sm:mb-8">
+    <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Search Events</h1>
+    <p class="mt-2 text-sm sm:text-base" style="color: rgb(var(--muted))">
+      Find events by title, country, genre, and price. Results update as you refine filters.
+    </p>
+  </header>
+
+  <!-- Filters panel -->
+  <app-event-search-filters
+    [genres]="genres()"
+    [countries]="countries()"
+    [sliderMax]="sliderMax()"
+    [globalMaxPrice]="globalMaxPrice()"
+    (filtersChange)="onFiltersChange($event)"
+    (reset)="onResetFilters()"
+  />
+
+  <!-- Results -->
+  <section class="mt-8">
+    <div class="flex items-end justify-between gap-4 mb-4">
+      <h2 class="text-xl sm:text-2xl font-bold">Results</h2>
+      <p class="text-sm" style="color: rgb(var(--muted))">
+        @if(!loading()) { {{ filteredEvents().length }} items }
+      </p>
+    </div>
+
+    @if(loading()) {
+    <div class="card p-6">
+      <p style="color: rgb(var(--muted))">Loading events…</p>
+    </div>
+    } @else { @if (filteredEvents().length > 0) {
+    <div class="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      @for (item of filteredEvents(); track item._id) {
+      <app-event-item
+        [event]="item"
+        [inCart]="isInCart(item._id)"
+        (toggleCart)="toggleCart($event)"
+      />
+      }
+    </div>
+    } @else {
+    <div class="card p-8 text-center">
+      <h3 class="text-lg font-semibold">No events match your search.</h3>
+      <p class="mt-2 text-sm" style="color: rgb(var(--muted))">
+        Try clearing some filters or searching with a shorter title.
+      </p>
+    </div>
+    } }
+  </section>
+</section>

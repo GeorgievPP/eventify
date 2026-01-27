@@ -1,1 +1,36 @@
-<p>dashboard-recent-orders works!</p>
+<section class="card p-5 sm:p-6 lg:col-span-7">
+  <div class="flex items-center justify-between gap-3">
+    <div>
+      <h2 class="text-lg font-bold">Recent orders</h2>
+      <p class="mt-1 text-sm" style="color: rgb(var(--muted))">{{ periodLabel() }}</p>
+    </div>
+
+    <a routerLink="/orders" class="btn btn-ghost">View all</a>
+  </div>
+
+  @if (orders().length === 0) {
+  <p class="mt-6 text-sm" style="color: rgb(var(--muted))">No orders in this period.</p>
+  } @else {
+  <ul class="mt-5 space-y-2">
+    @for (order of orders(); track order.id) {
+    <li>
+      <a [routerLink]="['/orders', order.id]" class="dash-row">
+        <div class="min-w-0">
+          <p class="font-semibold truncate">#{{ order.id }}</p>
+          <p class="mt-1 text-xs" style="color: rgb(var(--muted))">
+            {{ formatDate()(order.createdAt) }} • {{ order.items.length }} items
+          </p>
+        </div>
+
+        <div class="text-right shrink-0">
+          <p class="font-extrabold">{{ formatCurrency()(order.totalPrice) }} €</p>
+          <p class="mt-1 text-xs dash-status" style="color: rgb(var(--muted))">
+            {{ order.status }}
+          </p>
+        </div>
+      </a>
+    </li>
+    }
+  </ul>
+  }
+</section>

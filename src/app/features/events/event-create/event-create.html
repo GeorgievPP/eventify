@@ -1,1 +1,242 @@
-<p>event-create works!</p>
+<section class="container-app py-10">
+  <div class="mx-auto max-w-2xl">
+    <!-- Header -->
+    <header class="text-center mb-6">
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Add Event</h1>
+      <p class="mt-2 text-sm sm:text-base" style="color: rgb(var(--muted))">
+        Create a new event listing for the catalog.
+      </p>
+    </header>
+
+    <!-- Card -->
+    <section class="card p-5 sm:p-6">
+      <form class="grid gap-4" [formGroup]="formGroup" (ngSubmit)="submit()">
+        <!-- Title -->
+        <div>
+          <label for="title" class="block text-sm font-medium mb-1">Title</label>
+          <input
+            class="input"
+            type="text"
+            formControlName="title"
+            id="title"
+            placeholder="Event title"
+          />
+
+          @if(showTitleRequiredError) {
+          <p class="mt-2 text-sm" style="color: rgb(var(--danger))">Title is required.</p>
+          } @if (showTitleMinLengthError) {
+          <p class="mt-2 text-sm" style="color: rgb(var(--danger))">
+            Title must be at least 2 characters.
+          </p>
+          }
+        </div>
+
+        <!-- Image URL -->
+        <div>
+          <label for="image-url" class="block text-sm font-medium mb-1">Image URL</label>
+          <input
+            class="input"
+            type="text"
+            formControlName="imageUrl"
+            id="image-url"
+            placeholder="https://..."
+          />
+
+          @if (showImageUrlRequiredError) {
+          <p class="mt-2 text-sm" style="color: rgb(var(--danger))">Image URL is required.</p>
+          }
+        </div>
+
+        <!-- 2 columns: Genre / Country -->
+        <div class="grid gap-4 sm:grid-cols-2">
+          <!-- Genre (Event Type) -->
+          <div>
+            <label for="genre" class="block text-sm font-medium mb-1">Event Type</label>
+            <input
+              class="input"
+              type="text"
+              formControlName="genre"
+              id="genre"
+              placeholder="e.g. Concert, Theatre, Sports"
+            />
+
+            @if (showGenreRequiredError) {
+            <p class="mt-2 text-sm" style="color: rgb(var(--danger))">Event type is required.</p>
+            } @if (showGenreMinLengthError) {
+            <p class="mt-2 text-sm" style="color: rgb(var(--danger))">
+              Event type must be at least 3 characters.
+            </p>
+            }
+          </div>
+
+          <!-- Country -->
+          <div>
+            <label for="country" class="block text-sm font-medium mb-1">Country</label>
+            <input
+              class="input"
+              type="text"
+              formControlName="country"
+              id="country"
+              placeholder="e.g. Bulgaria"
+            />
+
+            @if (showCountryRequiredError) {
+            <p class="mt-2 text-sm" style="color: rgb(var(--danger))">Country is required.</p>
+            } @if (showCountryMinLengthError) {
+            <p class="mt-2 text-sm" style="color: rgb(var(--danger))">
+              Country must be at least 2 characters.
+            </p>
+            }
+          </div>
+        </div>
+
+        <!-- Event Date & Time -->
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label for="event-date" class="block text-sm font-medium mb-1">Event Date</label>
+            <input
+              class="input"
+              type="datetime-local"
+              formControlName="eventDate"
+              id="event-date"
+            />
+
+            @if (showEventDateRequiredError) {
+            <p class="mt-2 text-sm" style="color: rgb(var(--danger))">Event date is required.</p>
+            }
+          </div>
+
+          <div>
+            <label for="event-time" class="block text-sm font-medium mb-1">
+              Event Time (optional)
+            </label>
+            <input
+              class="input"
+              type="text"
+              formControlName="eventTime"
+              id="event-time"
+              placeholder="e.g. 20:00"
+            />
+          </div>
+        </div>
+
+        <!-- Venue & Location -->
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label for="venue" class="block text-sm font-medium mb-1">Venue</label>
+            <input
+              class="input"
+              type="text"
+              formControlName="venue"
+              id="venue"
+              placeholder="e.g. National Stadium"
+            />
+
+            @if (showVenueRequiredError) {
+            <p class="mt-2 text-sm" style="color: rgb(var(--danger))">Venue is required.</p>
+            }
+          </div>
+
+          <div>
+            <label for="location" class="block text-sm font-medium mb-1">Location</label>
+            <input
+              class="input"
+              type="text"
+              formControlName="location"
+              id="location"
+              placeholder="e.g. Sofia, Bulgaria"
+            />
+
+            @if (showLocationRequiredError) {
+            <p class="mt-2 text-sm" style="color: rgb(var(--danger))">Location is required.</p>
+            }
+          </div>
+        </div>
+
+        <!-- Price & Total Tickets -->
+        <div class="grid gap-4 sm:grid-cols-2">
+          <!-- Price -->
+          <div>
+            <label for="price" class="block text-sm font-medium mb-1">Price (€)</label>
+            <input
+              class="input"
+              type="number"
+              formControlName="price"
+              id="price"
+              placeholder="0.00"
+              min="0"
+              step="0.01"
+            />
+
+            @if (showPriceRequiredError) {
+            <p class="mt-2 text-sm" style="color: rgb(var(--danger))">Price is required.</p>
+            } @if (showPriceMinError) {
+            <p class="mt-2 text-sm" style="color: rgb(var(--danger))">
+              Price must be a positive number.
+            </p>
+            }
+          </div>
+
+          <!-- Total Tickets -->
+          <div>
+            <label for="total-tickets" class="block text-sm font-medium mb-1">Total Tickets</label>
+            <input
+              class="input"
+              type="number"
+              formControlName="totalTickets"
+              id="total-tickets"
+              placeholder="0"
+              min="1"
+              step="1"
+            />
+
+            @if (showTotalTicketsRequiredError) {
+            <p class="mt-2 text-sm" style="color: rgb(var(--danger))">
+              Total tickets is required.
+            </p>
+            } @if (showTotalTicketsMinError) {
+            <p class="mt-2 text-sm" style="color: rgb(var(--danger))">
+              Total tickets must be at least 1.
+            </p>
+            }
+          </div>
+        </div>
+
+        <!-- Details -->
+        <div>
+          <label for="details" class="block text-sm font-medium mb-1">Details</label>
+          <textarea
+            id="details"
+            class="details-textarea"
+            formControlName="details"
+            placeholder="Write a short description..."
+            rows="4"
+          ></textarea>
+
+          @if (showDetailsRequiredError) {
+          <p class="mt-2 text-sm" style="color: rgb(var(--danger))">Details are required.</p>
+          } @if (showDetailsMinLengthError) {
+          <p class="mt-2 text-sm" style="color: rgb(var(--danger))">
+            Details must be at least 10 characters.
+          </p>
+          }
+        </div>
+
+        <!-- Actions -->
+        <div class="pt-2 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+          <p class="text-xs" style="color: rgb(var(--muted))">
+            Tip: Use a high-quality image URL for best results.
+          </p>
+
+          <button
+            type="submit"
+            class="btn btn-primary w-full sm:w-auto"
+            [disabled]="formGroup.invalid || submitting()"
+          >
+            @if (submitting()) { Saving… } @else { Add Event }
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+</section>

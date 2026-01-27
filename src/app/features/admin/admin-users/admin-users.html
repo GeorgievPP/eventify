@@ -1,1 +1,143 @@
-<p>admin-users works!</p>
+<section id="admin-users" class="container-app py-10">
+  <!-- Header -->
+  <header class="mb-6 sm:mb-8">
+    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wide" style="color: rgb(var(--muted))">
+          Admin
+        </p>
+        <h1 class="mt-1 text-3xl sm:text-4xl font-extrabold tracking-tight">Users</h1>
+        <p class="mt-2 text-sm sm:text-base" style="color: rgb(var(--muted))">
+          Manage user accounts, roles, and permissions.
+        </p>
+      </div>
+
+      <nav class="flex flex-wrap gap-2">
+        <a routerLink="/admin/dashboard" class="btn btn-ghost">Dashboard</a>
+        <a routerLink="/admin/events" class="btn btn-ghost">Events</a>
+        <button 
+          type="button" 
+          class="btn btn-ghost" 
+          (click)="exportUsers()"
+          [disabled]="loading()"
+        >
+          Export to Excel
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  @if (!isStaff()) {
+  <section class="card p-6">
+    <h3 class="text-lg font-bold">Access Denied</h3>
+    <p class="mt-2 text-sm" style="color: rgb(var(--muted))">
+      You do not have permissions to view this page.
+    </p>
+  </section>
+  } @else {
+
+  <!-- Stats Overview -->
+  <section class="grid gap-4 sm:gap-5 lg:grid-cols-5 mb-6">
+    <article class="card p-4 sm:p-5">
+      <p class="text-xs font-semibold uppercase tracking-wide" style="color: rgb(var(--muted))">
+        Total Users
+      </p>
+      <p class="mt-2 text-2xl sm:text-3xl font-extrabold">{{ userStats().total }}</p>
+    </article>
+
+    <article class="card p-4 sm:p-5">
+      <p class="text-xs font-semibold uppercase tracking-wide" style="color: rgb(var(--muted))">
+        Active
+      </p>
+      <p class="mt-2 text-2xl sm:text-3xl font-extrabold text-green-500">
+        {{ userStats().active }}
+      </p>
+    </article>
+
+    <article class="card p-4 sm:p-5">
+      <p class="text-xs font-semibold uppercase tracking-wide" style="color: rgb(var(--muted))">
+        Deleted
+      </p>
+      <p class="mt-2 text-2xl sm:text-3xl font-extrabold" style="color: rgb(var(--muted))">
+        {{ userStats().deleted }}
+      </p>
+    </article>
+
+    <article class="card p-4 sm:p-5">
+      <p class="text-xs font-semibold uppercase tracking-wide" style="color: rgb(var(--muted))">
+        Admins
+      </p>
+      <p class="mt-2 text-2xl sm:text-3xl font-extrabold text-purple-500">
+        {{ userStats().admins }}
+      </p>
+    </article>
+
+    <article class="card p-4 sm:p-5 bg-gradient-to-br from-blue-500/10 to-purple-500/10">
+      <p class="text-xs font-semibold uppercase tracking-wide" style="color: rgb(var(--muted))">
+        Power Users
+      </p>
+      <p class="mt-2 text-2xl sm:text-3xl font-extrabold">{{ userStats().powerusers }}</p>
+    </article>
+  </section>
+
+  @if (loading()) {
+  <section class="card p-6">
+    <p style="color: rgb(var(--muted))">Loading users…</p>
+  </section>
+  } @else {
+
+  <!-- Filters -->
+  <app-admin-users-toolbar
+    [searchTerm]="searchTerm()"
+    [statusFilter]="statusFilter()"
+    [resultsCount]="filteredUsers().length"
+    [totalCount]="users().length"
+    (searchChange)="setSearchTerm($event)"
+    (statusFilterChange)="setStatusFilter($event)"
+    (reset)="resetFilters()"
+  />
+
+  <!-- Empty State -->
+  @if (filteredUsers().length === 0) {
+  <section class="card p-12 text-center">
+    <div class="text-5xl mb-3">👥</div>
+    <h3 class="text-xl font-bold">No users found</h3>
+    <p class="mt-2 text-sm max-w-md mx-auto" style="color: rgb(var(--muted))">
+      @if (searchTerm() || statusFilter() !== 'all') {
+        No users match your current filters. Try adjusting your search.
+      } @else {
+        No users available.
+      }
+    </p>
+    @if (searchTerm() || statusFilter() !== 'all') {
+    <button type="button" class="btn btn-primary mt-4" (click)="resetFilters()">
+      Clear Filters
+    </button>
+    }
+  </section>
+  } @else {
+
+  <!-- Table -->
+  <app-admin-users-table
+    [users]="filteredUsers()"
+    [isAdmin]="isAdmin()"
+    [roles]="roles"
+    [isSaving]="isSavingFn"
+    [isChangingStatus]="isChangingStatusFn"
+    [statusLabel]="statusLabelFn"
+    (roleChange)="onRoleChange($event.userId, $event.newRole)"
+    (requestDelete)="openUserModal($event, 'delete')"
+    (requestRestore)="openUserModal($event, 'restore')"
+  />
+
+  } } }
+
+  <!-- Modal -->
+  <app-admin-users-confirm-dialog
+    [open]="userModalOpen()"
+    [mode]="modalMode()"
+    [user]="modalUser()"
+    (cancel)="closeUserModal()"
+    (confirm)="confirmUserModal()"
+  />
+</section>

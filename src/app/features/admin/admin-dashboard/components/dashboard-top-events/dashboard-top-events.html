@@ -1,1 +1,38 @@
-<p>dashboard-top-events works!</p>
+<section class="card p-5 sm:p-6 lg:col-span-5">
+  <div class="flex items-center justify-between gap-3">
+    <div>
+      <h2 class="text-lg font-bold">Top events</h2>
+      <p class="mt-1 text-sm" style="color: rgb(var(--muted))">{{ periodLabel() }}</p>
+    </div>
+  </div>
+
+  @if (events().length === 0) {
+  <p class="mt-6 text-sm" style="color: rgb(var(--muted))">No event sales in this period.</p>
+  } @else {
+  <div class="mt-5 overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr style="color: rgb(var(--muted))">
+          <th class="text-left font-semibold pb-3">Title</th>
+          <th class="text-right font-semibold pb-3">Qty</th>
+          <th class="text-right font-semibold pb-3">Revenue</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (event of events(); track event.eventId) {
+        <tr class="border-t" style="border-color: rgb(var(--border))">
+          <td class="py-3 pr-3">
+            <a [routerLink]="['/details-event', event.eventId]" class="nav-link">
+              {{ event.title }}
+            </a>
+          </td>
+          <td class="py-3 text-right font-semibold">{{ event.totalQuantity }}</td>
+          <td class="py-3 text-right font-extrabold">{{ formatCurrency()(event.totalRevenue) }} €</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  }
+</section>

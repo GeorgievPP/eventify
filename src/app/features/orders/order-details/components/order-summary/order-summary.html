@@ -1,1 +1,77 @@
-<p>order-summary works!</p>
+<div class="space-y-6">
+  <!-- Main Info Row -->
+  <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+    <!-- Left: Order ID & Date -->
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-3 flex-wrap">
+        <h2 class="text-xl sm:text-2xl font-extrabold">Order #{{ order().id }}</h2>
+        
+        <!-- Status Badge -->
+        <span
+          class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-bold border"
+          [class]="getStatusColor(order().status)"
+        >
+          <span>{{ getStatusEmoji(order().status) }}</span>
+          <span>{{ formatStatus(order().status) }}</span>
+        </span>
+      </div>
+
+      <p class="mt-2 text-sm" style="color: rgb(var(--muted))">
+        {{ formatDate(order().createdAt) }}
+      </p>
+
+      @if (isStaff() && order().userEmail) {
+      <div class="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm"
+           style="background: rgba(var(--accent), 0.08); border: 1px solid rgba(var(--border), 0.5)">
+        <span class="font-semibold" style="color: rgb(var(--muted))">Customer:</span>
+        <span class="font-medium">{{ order().userEmail }}</span>
+      </div>
+      }
+    </div>
+
+    <!-- Right: Total Price -->
+    <div class="text-left sm:text-right">
+      <p class="text-xs font-semibold uppercase tracking-wide" style="color: rgb(var(--muted))">
+        Total Amount
+      </p>
+      <p class="mt-1 text-3xl sm:text-4xl font-extrabold">
+        {{ formatCurrency(order().totalPrice) }} €
+      </p>
+    </div>
+  </div>
+
+  <!-- Stats Row -->
+  <div
+    class="flex flex-wrap items-center gap-4 pt-5 text-sm"
+    style="border-top: 1px solid rgb(var(--border))"
+  >
+    <div class="flex items-center gap-2">
+      <span class="text-xl">🎫</span>
+      <span style="color: rgb(var(--muted))">
+        <strong class="font-semibold text-foreground">{{ itemsCount() }}</strong>
+        {{ itemsCount() === 1 ? 'item' : 'items' }}
+      </span>
+    </div>
+
+    <span style="color: rgb(var(--muted))">•</span>
+
+    <div class="flex items-center gap-2">
+      <span class="text-xl">📊</span>
+      <span style="color: rgb(var(--muted))">
+        Avg: <strong class="font-semibold text-foreground">{{ formatCurrency(avgItemPrice()) }} €</strong> per item
+      </span>
+    </div>
+
+    @if (order().items.length > 0) {
+    <span style="color: rgb(var(--muted))">•</span>
+
+    <div class="flex items-center gap-2">
+      <span class="text-xl">📦</span>
+      <span style="color: rgb(var(--muted))">
+        <strong class="font-semibold text-foreground">{{ order().items.length }}</strong>
+        {{ order().items.length === 1 ? 'event' : 'events' }}
+      </span>
+    </div>
+    }
+  </div>
+</div>

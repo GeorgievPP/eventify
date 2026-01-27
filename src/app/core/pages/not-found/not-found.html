@@ -1,1 +1,26 @@
-<p>not-found works!</p>
+<section class="container-app py-12">
+  <div class="nf-wrap">
+    <section class="card nf-card p-6 sm:p-8">
+      <div class="nf-badge">
+        <span class="nf-badge__dot"></span>
+        404 • Page not found
+      </div>
+
+      <h1 class="nf-title">This page doesn’t exist.</h1>
+
+      <p class="nf-sub" style="color: rgb(var(--muted))">
+        The link may be broken, or the page may have been moved. Use the buttons below to get back
+        on track.
+      </p>
+
+      <div class="nf-actions">
+        <button type="button" class="btn btn-ghost" (click)="goBack()">← Go back</button>
+        <a routerLink="/home" class="btn btn-primary">Go to Home</a>
+      </div>
+
+      <div class="nf-hint" style="color: rgb(var(--muted))">
+        Tip: check the URL spelling, or use the navigation above.
+      </div>
+    </section>
+  </div>
+</section>

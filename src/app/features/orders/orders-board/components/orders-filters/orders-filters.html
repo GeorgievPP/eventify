@@ -1,1 +1,82 @@
-<p>orders-filters works!</p>
+<section class="card p-4 sm:p-6">
+  <div class="grid gap-4 sm:grid-cols-12 items-end">
+    <!-- Email Filter (Staff only) -->
+    @if (isStaff()) {
+    <div class="sm:col-span-3">
+      <label class="block text-sm font-medium mb-1">Email</label>
+      <input
+        class="input"
+        type="text"
+        placeholder="Search by email..."
+        [ngModel]="email()"
+        (ngModelChange)="emailChange.emit($event)"
+        autocomplete="off"
+      />
+    </div>
+    }
+
+    <!-- Status Filter -->
+    <div class="@if (isStaff) { sm:col-span-3 } @else { sm:col-span-4 }">
+      <label class="block text-sm font-medium mb-1">Status</label>
+      <select class="input" [ngModel]="status" (ngModelChange)="statusChange.emit($event)">
+        @for (opt of statusOptions(); track opt.value) {
+        <option [ngValue]="opt.value">{{ opt.label }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Date Range Filter -->
+    <div class="@if (isStaff) { sm:col-span-3 } @else { sm:col-span-4 }">
+      <label class="block text-sm font-medium mb-1">Date Range</label>
+      <select class="input" [ngModel]="dateRange" (ngModelChange)="dateRangeChange.emit($event)">
+        @for (opt of dateRangeOptions(); track opt.value) {
+        <option [ngValue]="opt.value">{{ opt.label }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Actions -->
+    <div class="@if (isStaff) { sm:col-span-3 } @else { sm:col-span-4 }">
+      <div class="flex flex-col sm:flex-row gap-2 sm:justify-end">
+        @if (isStaff()) {
+        <button type="button" class="btn btn-ghost" (click)="exportAll.emit()" title="Export all orders">
+          Export
+        </button>
+        <button type="button" class="btn btn-ghost" (click)="export30.emit()" title="Export last 30 days">
+          30d
+        </button>
+        <button type="button" class="btn btn-ghost" (click)="export7.emit()" title="Export last 7 days">
+          7d
+        </button>
+        }
+        @if (isAdmin()) {
+        <button 
+          type="button" 
+          class="btn btn-ghost btn-danger-soft" 
+          (click)="clearHistory.emit()"
+          title="Clear order history"
+        >
+          Clear
+        </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Summary -->
+  <div class="mt-4 flex items-center gap-4 text-sm">
+    <span>
+      Showing: <strong class="font-semibold">{{ resultsCount() }}</strong>
+      @if (resultsCount() !== effectiveCount()) {
+        <span style="color: rgb(var(--muted))"> of {{ effectiveCount() }}</span>
+      }
+    </span>
+    
+    @if (resultsCount() !== effectiveCount() && resultsCount() > 0) {
+    <span style="color: rgb(var(--muted))">•</span>
+    <span style="color: rgb(var(--muted))">
+      {{ effectiveCount() - resultsCount() }} filtered out
+    </span>
+    }
+  </div>
+</section>

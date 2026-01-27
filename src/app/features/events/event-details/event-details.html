@@ -1,1 +1,51 @@
-<p>event-details works!</p>
+<section id="details">
+  <!-- HERO -->
+  <app-event-details-hero
+    [event]="singleEvent()"
+    [loading]="loading()"
+    [isStaff]="isStaff()"
+    [inCart]="isInCart()"
+    [userId]="userId()"
+    [userRating]="userRating()"
+    (toggleCart)="toggleCart()"
+    (openDelete)="openDeleteConfirm($event.id, $event.mode)"
+    (restore)="restoreEvent()"
+  />
+
+  <!-- Рейтинг -->
+  <!-- <app-event-rating
+    [event]="singleEvent()"
+    [userId]="userId"
+    [submitting]="ratingSubmitting()"
+    (rate)="onRate($event)"
+  /> -->
+
+  <!-- COMMENTS -->
+  <app-event-comments
+    [eventId]="id!"
+    [userId]="userId()"
+    [isStaff]="isStaff()"
+  />
+
+  <!-- Details: Event history (staff) -->
+  @if (isStaff()) {
+    <app-event-history
+      [history]="history()"
+      [loading]="historyLoading()"
+    />
+  }
+
+  <!-- CONFIRM DELETE popup -->
+  <app-confirm-dialog
+    [open]="isConfirmOpen()"
+    [title]="deleteMode() === 'hard' ? 'Permanently delete event' : 'Delete event'"
+    [message]="deleteMode() === 'hard'
+      ? 'This action will permanently delete the event. This cannot be undone.'
+      : 'This will mark the event as deleted (soft delete). You can restore it later from Admin.'"
+    [confirmText]="deleteMode() === 'hard' ? 'Hard delete' : 'Delete'"
+    [cancelText]="'Cancel'"
+    [variant]="deleteMode() === 'hard' ? 'danger' : 'default'"
+    (cancel)="cancelDelete()"
+    (confirm)="confirmDelete()"
+  />
+</section>
