@@ -1,7 +1,6 @@
 import { computed, Injectable, signal } from '@angular/core';
 import { EventComment } from '../../../models/events';
 
-
 @Injectable({
   providedIn: 'root',
 })
@@ -18,7 +17,7 @@ export class CommentStoreService {
   readonly comments = computed(() => this._comments());
   readonly currentEventId = computed(() => this._currentEventId());
   readonly totalComments = computed(() => this._comments().length);
-  
+
   readonly activeCommentsCount = computed(
     () => this._comments().filter((c) => !c.isDeleted).length,
   );
@@ -46,12 +45,17 @@ export class CommentStoreService {
   }
 
   updateComment(updatedComment: EventComment): void {
+    if (!updatedComment._id) {
+      console.error('[CommentStore] Cannot update comment without _id:', updatedComment);
+      return;
+    }
+
     this._comments.update((comments) => {
       const index = comments.findIndex((c) => c._id === updatedComment._id);
 
       if (index === -1) {
-        console.log(`[CommentStore] Comment not in list, adding: ${updatedComment._id}`);
-        return [...comments, updatedComment];
+        console.warn(`[CommentStore] Comment not found, skipping update: ${updatedComment._id}`);
+        return comments;
       }
 
       const newComments = [...comments];

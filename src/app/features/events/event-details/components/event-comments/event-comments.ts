@@ -71,7 +71,7 @@ export class EventComments {
           this.load();
         }
       },
-      { allowSignalWrites: true },
+      // { allowSignalWrites: true },
     );
   }
 

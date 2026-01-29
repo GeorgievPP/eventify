@@ -173,9 +173,8 @@ export class CommentService {
     this.store.optimisticallyToggleLike(commentId);
 
     return this.api.toggleLikeComment(commentId).pipe(
-      tap((updatedComment) => {
-        this.store.updateComment(updatedComment);
-        console.log(`[CommentService] Like toggled: ${commentId}`);
+      tap(() => {
+       console.log(`[CommentService] Like toggled successfully: ${commentId}`);
       }),
       catchError((error) => {
         this.store.rollbackToState(previousState);
