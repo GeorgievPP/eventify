@@ -70,7 +70,7 @@
                 type="button"
                 class="btn btn-ghost px-2 py-1 min-w-[32px]"
                 (click)="decrease.emit(i)"
-                [disabled]="savingItems || item.quantity <= 1"
+                [disabled]="savingItems() || item.quantity <= 1"
                 aria-label="Decrease"
               >
                 −
