@@ -18,7 +18,7 @@
     <!-- Status Filter -->
     <div class="@if (isStaff) { sm:col-span-3 } @else { sm:col-span-4 }">
       <label class="block text-sm font-medium mb-1">Status</label>
-      <select class="input" [ngModel]="status" (ngModelChange)="statusChange.emit($event)">
+      <select class="input" [ngModel]="status()" (ngModelChange)="statusChange.emit($event)">
         @for (opt of statusOptions(); track opt.value) {
         <option [ngValue]="opt.value">{{ opt.label }}</option>
         }
@@ -28,7 +28,7 @@
     <!-- Date Range Filter -->
     <div class="@if (isStaff) { sm:col-span-3 } @else { sm:col-span-4 }">
       <label class="block text-sm font-medium mb-1">Date Range</label>
-      <select class="input" [ngModel]="dateRange" (ngModelChange)="dateRangeChange.emit($event)">
+      <select class="input" [ngModel]="dateRange()" (ngModelChange)="dateRangeChange.emit($event)">
         @for (opt of dateRangeOptions(); track opt.value) {
         <option [ngValue]="opt.value">{{ opt.label }}</option>
         }

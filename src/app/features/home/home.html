@@ -20,7 +20,8 @@
         </h1>
 
         <p class="mt-4 text-base md:text-lg" style="color: rgb(var(--muted))">
-          Discover concerts, theatre, sports, and cultural events. Book tickets instantly and create memories that last forever. Your gateway to the best live experiences.
+          Discover concerts, theatre, sports, and cultural events. Book tickets instantly and create
+          memories that last forever. Your gateway to the best live experiences.
         </p>
 
         <div class="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -85,7 +86,9 @@
 
     <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
       <!-- Concert Card -->
-      <div class="card overflow-hidden group cursor-pointer transition-transform hover:scale-[1.02]">
+      <div
+        class="card overflow-hidden group cursor-pointer transition-transform hover:scale-[1.02]"
+      >
         <div class="relative h-48 overflow-hidden">
           <img
             src="/concert_energy.png"
@@ -94,7 +97,7 @@
           />
           <div
             class="absolute inset-0"
-            style="background: linear-gradient(to top, rgba(0,0,0,0.7), transparent)"
+            style="background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent)"
           ></div>
           <div class="absolute bottom-4 left-4 right-4">
             <h3 class="text-xl font-bold text-white">🎸 Concerts</h3>
@@ -102,12 +105,19 @@
           </div>
         </div>
         <div class="p-4">
-          <a routerLink="/events" class="btn btn-ghost w-full">View concerts</a>
+          <a
+            routerLink="/search-events"
+            [queryParams]="{ genre: 'Concert' }"
+            class="btn btn-ghost w-full"
+            >View concerts</a
+          >
         </div>
       </div>
 
       <!-- Theatre Card -->
-      <div class="card overflow-hidden group cursor-pointer transition-transform hover:scale-[1.02]">
+      <div
+        class="card overflow-hidden group cursor-pointer transition-transform hover:scale-[1.02]"
+      >
         <div class="relative h-48 overflow-hidden">
           <img
             src="/theatre.png"
@@ -116,7 +126,7 @@
           />
           <div
             class="absolute inset-0"
-            style="background: linear-gradient(to top, rgba(0,0,0,0.7), transparent)"
+            style="background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent)"
           ></div>
           <div class="absolute bottom-4 left-4 right-4">
             <h3 class="text-xl font-bold text-white">🎭 Theatre</h3>
@@ -124,12 +134,19 @@
           </div>
         </div>
         <div class="p-4">
-          <a routerLink="/events" class="btn btn-ghost w-full">View theatre</a>
+          <a
+            routerLink="/search-events"
+            [queryParams]="{ genre: 'Theatre' }"
+            class="btn btn-ghost w-full"
+            >View theatre</a
+          >
         </div>
       </div>
 
       <!-- Sports Card -->
-      <div class="card overflow-hidden group cursor-pointer transition-transform hover:scale-[1.02]">
+      <div
+        class="card overflow-hidden group cursor-pointer transition-transform hover:scale-[1.02]"
+      >
         <div class="relative h-48 overflow-hidden">
           <img
             src="/stadium_energy.png"
@@ -138,7 +155,7 @@
           />
           <div
             class="absolute inset-0"
-            style="background: linear-gradient(to top, rgba(0,0,0,0.7), transparent)"
+            style="background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent)"
           ></div>
           <div class="absolute bottom-4 left-4 right-4">
             <h3 class="text-xl font-bold text-white">⚽ Sports</h3>
@@ -146,12 +163,19 @@
           </div>
         </div>
         <div class="p-4">
-          <a routerLink="/events" class="btn btn-ghost w-full">View sports</a>
+          <a
+            routerLink="/search-events"
+            [queryParams]="{ genre: 'Sports' }"
+            class="btn btn-ghost w-full"
+            >View sports</a
+          >
         </div>
       </div>
 
       <!-- Festival Card -->
-      <div class="card overflow-hidden group cursor-pointer transition-transform hover:scale-[1.02]">
+      <div
+        class="card overflow-hidden group cursor-pointer transition-transform hover:scale-[1.02]"
+      >
         <div class="relative h-48 overflow-hidden">
           <img
             src="/festival_energy.png"
@@ -160,7 +184,7 @@
           />
           <div
             class="absolute inset-0"
-            style="background: linear-gradient(to top, rgba(0,0,0,0.7), transparent)"
+            style="background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent)"
           ></div>
           <div class="absolute bottom-4 left-4 right-4">
             <h3 class="text-xl font-bold text-white">🎪 Festivals</h3>
@@ -168,7 +192,12 @@
           </div>
         </div>
         <div class="p-4">
-          <a routerLink="/events" class="btn btn-ghost w-full">View festivals</a>
+          <a
+            routerLink="/search-events"
+            [queryParams]="{ genre: 'Festival' }"
+            class="btn btn-ghost w-full"
+            >View festivals</a
+          >
         </div>
       </div>
     </div>

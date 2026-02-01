@@ -1,5 +1,6 @@
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute } from '@angular/router';
 
 import { EventService } from '../../../core/services/events';
 import { NotificationService } from '../../../core/services/ui';
@@ -25,6 +26,7 @@ export class EventSearch implements OnInit {
   private notifications = inject(NotificationService);
   private cartService = inject(CartService);
   private destroyRef = inject(DestroyRef);
+  private route = inject(ActivatedRoute);
 
   // ==========================================
   // STATE FROM SERVICES
@@ -85,6 +87,8 @@ export class EventSearch implements OnInit {
     maxPrice: null as number | null,
   });
 
+  initialGenre = signal<string | null>(null);
+
   filteredEvents = computed<Event[]>(() => {
     const f = this.filters();
     const title = f.title.trim().toLowerCase();
@@ -113,6 +117,15 @@ export class EventSearch implements OnInit {
   ngOnInit(): void {
     console.log('[EventSearch] ngOnInit - events:', this.events().length);
 
+    const genreParam = this.route.snapshot.queryParams['genre'];
+    if (genreParam) {
+      this.initialGenre.set(genreParam);
+      this.filters.set({
+        ...this.filters(),
+        genres: [genreParam],
+      });
+    }
+
     if (this.events().length === 0) {
       this.loadEvents();
     }
@@ -127,6 +140,7 @@ export class EventSearch implements OnInit {
   }
 
   onResetFilters(): void {
+    this.initialGenre.set(null);
     this.filters.set({
       title: '',
       country: '',

@@ -1,12 +1,4 @@
-import {
-  Component,
-  computed,
-  EventEmitter,
-  inject,
-  input,
-  Output,
-  signal,
-} from '@angular/core';
+import { Component, computed, EventEmitter, inject, input, OnInit, Output, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 
@@ -14,14 +6,13 @@ import { ClickOutsideDirective } from '../../../../../shared/directives/click-ou
 import { SearchFilters } from '../../event-search.types';
 import { toSignal } from '@angular/core/rxjs-interop';
 
-
 @Component({
   selector: 'app-event-search-filters',
   imports: [ReactiveFormsModule, ClickOutsideDirective, DecimalPipe],
   templateUrl: './event-search-filters.html',
   styleUrl: './event-search-filters.css',
 })
-export class EventSearchFilters {
+export class EventSearchFilters implements OnInit {
   // ==========================================
   // DEPENDENCIES
   // ==========================================
@@ -34,6 +25,7 @@ export class EventSearchFilters {
   countries = input.required<string[]>();
   sliderMax = input<number>(0);
   globalMaxPrice = input<number>(0);
+  initialGenres = input<string[]>([]);
 
   // ==========================================
   // OUTPUTS
@@ -61,6 +53,17 @@ export class EventSearchFilters {
   selectedGenres = signal<string[]>([]);
   maxPrice = signal<number | null>(null);
   countryOpen = false;
+
+  // ==========================================
+  // LIFECYCLE
+  // ==========================================
+
+  ngOnInit(): void {
+    if (this.initialGenres().length > 0) {
+      this.selectedGenres.set(this.initialGenres());
+      this.emitFilters();
+    }
+  }
 
   // ==========================================
   // COMPUTED PROPERTIES
